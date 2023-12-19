@@ -17,14 +17,15 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .        *
  ***************************************************************************/
 
-import QtQuick 2.12
-import QtWebEngine 1.8
-import QtQuick.Layouts 1.10
-import QtQuick.Controls 2.12
+import QtQuick 2.15
+import QtWebEngine 1.11
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15
+import org.kde.plasma.plasma5support 2.0 as P5Support
 import org.kde.plasma.plasmoid 2.0
 import org.kde.plasma.components 2.0 as PlasmaComponents
 import org.kde.plasma.core 2.0 as PlasmaCore
-import QtQml 2.12
+import QtQml 2.15
 
 import "../code/utils.js" as ConfigUtils
 
@@ -33,69 +34,69 @@ import "../code/utils.js" as ConfigUtils
 Item {
     id: main
 
-    property string websliceUrl: plasmoid.configuration.websliceUrl
-    property double zoomFactorCfg: plasmoid.configuration.zoomFactor
-    property bool enableReload: plasmoid.configuration.enableReload
-    property int reloadIntervalSec: plasmoid.configuration.reloadIntervalSec
-    property bool displaySiteBehaviour: plasmoid.configuration.displaySiteBehaviour
-    property bool buttonBehaviour: plasmoid.configuration.buttonBehaviour
-    property int webPopupWidth: plasmoid.configuration.webPopupWidth
-    property int webPopupHeight: plasmoid.configuration.webPopupHeight
-    property string webPopupIcon: plasmoid.configuration.webPopupIcon
-    property bool showPinButton: plasmoid.configuration.showPinButton
-    property bool pinButtonAlignmentLeft: plasmoid.configuration.pinButtonAlignmentLeft
-    property bool reloadAnimation: plasmoid.configuration.reloadAnimation
-    property bool backgroundColorWhite: plasmoid.configuration.backgroundColorWhite
-    property bool backgroundColorTransparent: plasmoid.configuration.backgroundColorTransparent
-    property bool backgroundColorTheme: plasmoid.configuration.backgroundColorTheme
-    property bool backgroundColorCustom: plasmoid.configuration.backgroundColorCustom
-    property string customBackgroundColor: plasmoid.configuration.customBackgroundColor
+    property string websliceUrl: Plasmoid.configuration.websliceUrl
+    property double zoomFactorCfg: Plasmoid.configuration.zoomFactor
+    property bool enableReload: Plasmoid.configuration.enableReload
+    property int reloadIntervalSec: Plasmoid.configuration.reloadIntervalSec
+    property bool displaySiteBehaviour: Plasmoid.configuration.displaySiteBehaviour
+    property bool buttonBehaviour: Plasmoid.configuration.buttonBehaviour
+    property int webPopupWidth: Plasmoid.configuration.webPopupWidth
+    property int webPopupHeight: Plasmoid.configuration.webPopupHeight
+    property string webPopupIcon: Plasmoid.configuration.webPopupIcon
+    property bool showPinButton: Plasmoid.configuration.showPinButton
+    property bool pinButtonAlignmentLeft: Plasmoid.configuration.pinButtonAlignmentLeft
+    property bool reloadAnimation: Plasmoid.configuration.reloadAnimation
+    property bool backgroundColorWhite: Plasmoid.configuration.backgroundColorWhite
+    property bool backgroundColorTransparent: Plasmoid.configuration.backgroundColorTransparent
+    property bool backgroundColorTheme: Plasmoid.configuration.backgroundColorTheme
+    property bool backgroundColorCustom: Plasmoid.configuration.backgroundColorCustom
+    property string customBackgroundColor: Plasmoid.configuration.customBackgroundColor
 
-    property bool enableScrollTo: plasmoid.configuration.enableScrollTo
-    property int scrollToX: plasmoid.configuration.scrollToX
-    property int scrollToY: plasmoid.configuration.scrollToY
-    property bool enableJSID: plasmoid.configuration.enableJSID
-    property string jsSelector: plasmoid.configuration.jsSelector
-    property bool enableCustomUA: plasmoid.configuration.enableCustomUA
-    property string customUA: plasmoid.configuration.customUA
-    property bool enableReloadOnActivate: plasmoid.configuration.enableReloadOnActivate
-    property bool bypassSSLErrors: plasmoid.configuration.bypassSSLErrors
-    property bool scrollbarsShow: plasmoid.configuration.scrollbarsShow
-    property bool scrollbarsOverflow: plasmoid.configuration.scrollbarsOverflow
-    property bool scrollbarsWebkit: plasmoid.configuration.scrollbarsWebkit
-    property bool enableJS: plasmoid.configuration.enableJS
-    property string js: plasmoid.configuration.js
+    property bool enableScrollTo: Plasmoid.configuration.enableScrollTo
+    property int scrollToX: Plasmoid.configuration.scrollToX
+    property int scrollToY: Plasmoid.configuration.scrollToY
+    property bool enableJSID: Plasmoid.configuration.enableJSID
+    property string jsSelector: Plasmoid.configuration.jsSelector
+    property bool enableCustomUA: Plasmoid.configuration.enableCustomUA
+    property string customUA: Plasmoid.configuration.customUA
+    property bool enableReloadOnActivate: Plasmoid.configuration.enableReloadOnActivate
+    property bool bypassSSLErrors: Plasmoid.configuration.bypassSSLErrors
+    property bool scrollbarsShow: Plasmoid.configuration.scrollbarsShow
+    property bool scrollbarsOverflow: Plasmoid.configuration.scrollbarsOverflow
+    property bool scrollbarsWebkit: Plasmoid.configuration.scrollbarsWebkit
+    property bool enableJS: Plasmoid.configuration.enableJS
+    property string js: Plasmoid.configuration.js
 
-    property string urlsModel: plasmoid.configuration.urlsModel
+    property string urlsModel: Plasmoid.configuration.urlsModel
 
-    property string keysSeqBack: plasmoid.configuration.keysSeqBack
-    property string keysSeqForward: plasmoid.configuration.keysSeqForward
-    property string keysSeqReload: plasmoid.configuration.keysSeqReload
-    property string keysSeqStop: plasmoid.configuration.keysSeqStop
-    property bool fillWidthAndHeight: plasmoid.configuration.fillWidthAndHeight
-    property bool notOffTheRecord: plasmoid.configuration.notOffTheRecord
-    property string profileName: plasmoid.configuration.profileName
+    property string keysSeqBack: Plasmoid.configuration.keysSeqBack
+    property string keysSeqForward: Plasmoid.configuration.keysSeqForward
+    property string keysSeqReload: Plasmoid.configuration.keysSeqReload
+    property string keysSeqStop: Plasmoid.configuration.keysSeqStop
+    property bool fillWidthAndHeight: Plasmoid.configuration.fillWidthAndHeight
+    property bool notOffTheRecord: Plasmoid.configuration.notOffTheRecord
+    property string profileName: Plasmoid.configuration.profileName
 
     signal handleSettingsUpdated();
 
     Plasmoid.preferredRepresentation: (displaySiteBehaviour)? Plasmoid.fullRepresentation : Plasmoid.compactRepresentation
 
     Plasmoid.fullRepresentation: webview
-    
+
     Plasmoid.icon: webPopupIcon
-    
-    onUrlsModelChanged:{ loadURLs(); }
 
-    onWebPopupHeightChanged:{ main.handleSettingsUpdated(); }
+    onUrlsModelChanged:{ console.log("onUrlsModelChanged"); loadURLs(); }
 
-    onWebPopupWidthChanged:{  main.handleSettingsUpdated(); }
-    
-    onZoomFactorCfgChanged:{  main.handleSettingsUpdated(); }
+    onWebPopupHeightChanged:{ console.log("onWebPopupHeightChanged"); main.handleSettingsUpdated(); }
 
-    onNotOffTheRecordChanged:{ 
-        //console.debug("test");
+    onWebPopupWidthChanged:{  console.log("onWebPopupWidthChanged"); main.handleSettingsUpdated(); }
+
+    onZoomFactorCfgChanged:{  console.log("onZoomFactorCfgChanged"); main.handleSettingsUpdated(); }
+
+    onNotOffTheRecordChanged:{
+        console.log("test");
         //console.debug(Plasmoid.fullRepresentation);
-        //Plasmoid.fullRepresentation = null; 
+        //Plasmoid.fullRepresentation = null;
         //webviewID.destroy();
         //var component = Qt.createComponent("WebviewWebslice.qml");
         //webview = component.createObject(webview, {id: "webviewID"});
@@ -110,14 +111,16 @@ Item {
     Binding {
         target: plasmoid
         property: "hideOnWindowDeactivate"
-        value: !plasmoid.configuration.pin
+        value: !showPinButton
     }
 
 
-    property Component webview: WebEngineView{
+    property Component webview: WebEngineView {
         id: webviewID
         url: websliceUrl
-        anchors.fill: parent
+        // anchors.fill: parent
+	// anchors.fill: plasmoid.fullRepresentation
+	// anchors.fill: plasmoid.rootItem;
 
         backgroundColor: backgroundColorWhite?"white":(backgroundColorTransparent?"transparent":(backgroundColorTheme?theme.viewBackgroundColor:(backgroundColorCustom?customBackgroundColor:"black")))
 
@@ -127,14 +130,14 @@ Item {
         Layout.fillHeight: fillWidthAndHeight
 
         zoomFactor: zoomFactorCfg
-        
+
         onWidthChanged: updateSizeHints()
         onHeightChanged: updateSizeHints()
 
-        onCertificateError: if(bypassSSLErrors){error.ignoreCertificateError()}
+        // onCertificateError: if(bypassSSLErrors){error.ignoreCertificateError()}
 
         property bool isExternalLink: false
-        
+
         profile:  WebEngineProfile{
             httpUserAgent: (enableCustomUA)?customUA:httpUserAgent
             offTheRecord: !notOffTheRecord
@@ -144,7 +147,7 @@ Item {
 
         /* Access to system palette */
         SystemPalette { id: myPalette}
-        
+
         /**
          * Pin button
          */
@@ -157,12 +160,12 @@ Item {
             icon.name: "window-pin"
             hoverEnabled: false
             focusPolicy: Qt.NoFocus
-            checked: plasmoid.configuration.pin
-            onCheckedChanged: plasmoid.configuration.pin = checked
+            checked: showPinButton
+            onCheckedChanged: showPinButton = checked
             visible: !displaySiteBehaviour && showPinButton
             z:1
             palette {
-                button: plasmoid.configuration.pin ? myPalette.highlight : myPalette.button
+                button: showPinButton ? myPalette.highlight : myPalette.button
             }
         }
 
@@ -172,41 +175,48 @@ Item {
          * Thanks to https://github.com/pronobis/webslice-plasmoid/commit/07633bf508c1876d45645415dfc98b802322d407
          */
         Plasmoid.onActivated: {
+	    console.log("Plasmoid.onActivated");
             if(enableReloadOnActivate){
                 reloadFn(false);
             }
         }
 
+	function onHandleSettingsUpdated() {
+	    console.log("onHandleSettingsUpdated")
+	    loadMenu();
+	    updateSizeHints();
+	}
+
         Connections {
             target: main
-            onHandleSettingsUpdated: {
-                loadMenu();
-                updateSizeHints();
-            }
         }
-        
+
         Shortcut {
             id:shortreload
             sequences: [StandardKey.Refresh, keysSeqReload]
             onActivated: reloadFn(false)
         }
-        
+
         Shortcut {
             sequences: [StandardKey.Back, keysSeqBack]
             onActivated: goBack()
         }
-        
+
         Shortcut {
             sequences: [StandardKey.Forward, keysSeqForward]
             onActivated: goForward()
         }
-        
+
         Shortcut {
             sequences: [StandardKey.Cancel, keysSeqStop]
             onActivated: {
+		console.log("Stop activated");
                 stop();
+		plasmoid.busy = false;
+		/*
                 busyIndicator.visible = false;
                 busyIndicator.running = false;
+		*/
             }
         }
 
@@ -214,13 +224,14 @@ Item {
          * Hack to handle the size of the popup when displayed as a compactRepresentation
          */
         function updateSizeHints() {
-            //console.debug(webviewID.height + " " + webPopupHeight + " " + plasmoid.configuration.webPopupHeight + " " +displaySiteBehaviour);
+	    console.log("updateSizeHints")
+            //console.debug(webviewID.height + " " + webPopupHeight + " " + Plasmoid.configuration.webPopupHeight + " " +displaySiteBehaviour);
             webviewID.zoomFactor = zoomFactorCfg;
+	    webviewID.reload();
             if(!displaySiteBehaviour){
                 webviewID.height = webPopupHeight;
                 webviewID.width = webPopupWidth;
-                webviewID.reload();
-                //console.debug("inside" + webviewID.height + " " + webPopupHeight + " " + plasmoid.configuration.webPopupHeight + " " +displaySiteBehaviour);
+                //console.debug("inside" + webviewID.height + " " + webPopupHeight + " " + Plasmoid.configuration.webPopupHeight + " " +displaySiteBehaviour);
             }
         }
 
@@ -228,6 +239,17 @@ Item {
          * Handle everything around web request : display the busy indicator, and run JS
          */
         onLoadingChanged: {
+	    console.log("onLoadingChanged")
+	    console.log("loadRequest.status:", loadRequest.status)
+	    console.log("loadRequest.errorCode:", loadRequest.errorCode)
+	    console.log("loadRequest.errorDomain:", loadRequest.errorDomain)
+	    console.log("loadRequest.errorString:", loadRequest.errorString)
+	    console.log("loadRequest.url:", loadRequest.url)
+	    console.log("WebEngineView.LoadStartedStatus:", WebEngineView.LoadStartedStatus)
+	    console.log("WebEngineView.LoadStoppedStatus:", WebEngineView.LoadStoppedStatus)
+	    console.log("WebEngineView.LoadSucceededStatus:", WebEngineView.LoadSucceededStatus)
+	    console.log("WebEngineView.LoadFailedStatus:", WebEngineView.LoadFailedStatus)
+	    console.log("zoomFactorCfg:", zoomFactorCfg)
             webviewID.zoomFactor = zoomFactorCfg;
             if (enableScrollTo && loadRequest.status === WebEngineView.LoadSucceededStatus) {
                 runJavaScript("window.scrollTo("+scrollToX+", "+scrollToY+");");
@@ -246,38 +268,83 @@ Item {
                 runJavaScript(js);
             }
             if (loadRequest && (loadRequest.status === WebEngineView.LoadSucceededStatus || loadRequest.status === WebEngineLoadRequest.LoadFailedStatus)) {
+		plasmoid.busy = false;
+		/*
                 busyIndicator.visible = false;
                 busyIndicator.running = false;
+		*/
             }
         }
+
+	onRenderProcessPidChanged: {
+	    console.log("onRenderProcessPidChanged");
+	}
 
         /**
          * Open the middle clicked (or ctrl+clicked) link in the default browser
          */
         onNavigationRequested: {
+	    console.log("onNavigationRequested, request.action:", request.action, "isMainFrame:", request.isMainFrame, "navigationType:", request.navigationType, "url:", request.url, "isExternalLink:", isExternalLink, "zoomFactorCfg:", zoomFactorCfg)
+	    console.log("LinkClickedNavigation", WebEngineNavigationRequest.LinkClickedNavigation);
+	    console.log("TypedNavigation", WebEngineNavigationRequest.TypedNavigation);
+	    console.log("FormSubmittedNavigation", WebEngineNavigationRequest.FormSubmittedNavigation);
+	    console.log("BackForwardNavigation", WebEngineNavigationRequest.BackForwardNavigation);
+	    console.log("ReloadNavigation", WebEngineNavigationRequest.ReloadNavigation);
+	    console.log("RedirectNavigation", WebEngineNavigationRequest.RedirectNavigation);
+	    console.log("OtherNavigation", WebEngineNavigationRequest.OtherNavigation);
             webviewID.zoomFactor = zoomFactorCfg;
             if(isExternalLink){
                 isExternalLink = false;
                 request.action = WebEngineView.IgnoreRequest;
                 Qt.openUrlExternally(request.url);
             }else if(reloadAnimation){
+		plasmoid.busy = true;
+		/*
                 busyIndicator.visible = true;
                 busyIndicator.running = true;
+		*/
             }
         }
-        
+
+	onCertificateError: {
+	    console.log("onCertificateError, bypassSSLErrors:", bypassSSLErrors);
+	    if (bypassSSLErrors) {
+		error.ignoreCertificateError()
+	    }
+	}
+
+	onWindowCloseRequested: {
+	    console.log("onWindowCloseRequested");
+	}
+
+	onRenderProcessTerminated: {
+	    console.log("onRenderProcessTerminated terminationStatus:", terminationStatus, "exitCode:", exitCode)
+	}
+
         onNewViewRequested: {
+	    console.log("onNewViewRequested")
             if(request.userInitiated){
                 isExternalLink = true;
             }else{
                 isExternalLink = false;
             }
         }
-        
+
         /**
          * Show context menu
          */
         onContextMenuRequested: {
+	    console.log("onContextMenuRequested")
+	    console.log("ErrorDomain:", webviewID.ErrorDomain)
+	    console.log("Feature:", webviewID.Feature)
+	    console.log("LifecycleState:", webviewID.LifecycleState)
+	    console.log("LoadStatus:", webviewID.LoadStatus)
+	    console.log("RenderProcessTerminationStatus:", webviewID.RenderProcessTerminationStatus)
+	    console.log("WebAction:", webviewID.WebAction)
+	    console.log("loadingProgress:", webviewID.loadingProgress)
+	    console.log("loading:", webviewID.loading)
+	    console.log("title:", webviewID.title)
+	    console.log("url:", url)
             request.accepted = true
             contextMenu.request = request
             contextMenu.open(request.x, request.y)
@@ -287,7 +354,7 @@ Item {
         /**
          * Get status of Ctrl key
          */
-         PlasmaCore.DataSource {
+         P5Support.DataSource {
             id: dataSource
             engine: "keystate"
             connectedSources: ["Ctrl"]
@@ -318,10 +385,11 @@ Item {
                 text: i18n('Reload')
                 icon: 'view-refresh'
                 onClicked: {
+		    console.log("Refresh clicked")
                     // Force reload if Ctrl pressed
-                    if(dataSource.data["Ctrl"]["Pressed"]){
+		    if (dataSource.data.Ctrl !== undefined && dataSource.data.Ctrl.Pressed) {
                         reloadFn(true);
-                    }else{
+                    } else {
                         reloadFn(false);
                     }
                 }
@@ -348,7 +416,7 @@ Item {
                     }
                 }
             }
-            
+
             PlasmaComponents.MenuItem {
                 text: i18n('Go Home')
                 icon: 'go-home'
@@ -362,12 +430,12 @@ Item {
                 icon: 'document-share'
                 onClicked: Qt.openUrlExternally(webviewID.url)
             }
-            
+
             PlasmaComponents.MenuItem{
                 separator: true
                 visible: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
             }
-            
+
             PlasmaComponents.MenuItem {
                 text: i18n('Open link\'s URL in default browser')
                 icon: 'document-share'
@@ -375,13 +443,14 @@ Item {
                 visible: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
                 onClicked: Qt.openUrlExternally(contextMenu.request.linkUrl)
             }
-            
+
             PlasmaComponents.MenuItem {
                 text: i18n('Copy link\'s URL')
                 icon: 'edit-copy'
                 enabled: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
                 visible: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
                 onClicked: {
+		    console.log("Copy link URL clicked")
                     copyURLTextEdit.text = contextMenu.request.linkUrl
                     copyURLTextEdit.selectAll()
                     copyURLTextEdit.copy()
@@ -391,7 +460,7 @@ Item {
                     visible: false
                 }
             }
-            
+
             PlasmaComponents.MenuItem{
                 separator: true
             }
@@ -399,11 +468,12 @@ Item {
             PlasmaComponents.MenuItem {
                 text: i18n('Configure')
                 icon: 'configure'
-                onClicked: plasmoid.action("configure").trigger()
+                onClicked: Plasmoid.action("configure").trigger()
             }
         }
 
         function addEntry(stringURL) {
+	    console.log("addEntry:", stringURL)
             var menuItemI = menuItem.createObject(dynamicMenu, {text: stringURL, icon: 'link', "stringURL":stringURL});
             menuItemI.clicked.connect(function() { webviewID.url = stringURL; });
         }
@@ -415,6 +485,7 @@ Item {
         }
 
         function loadMenu() {
+	    console.log("loadMenu")
             for(var i=1; i<dynamicMenu.content.length; i++){
                 dynamicMenu.content[i].visible=false;
             }
@@ -425,6 +496,7 @@ Item {
         }
 
         Component.onCompleted: {
+	    console.log("Component.onCompleted")
             loadURLs();
         }
 
@@ -433,15 +505,17 @@ Item {
             running: enableReload
             repeat: true
             onTriggered: {
+		console.log("reload triggered")
                 reloadFn(false)
             }
         }
 
+	/*
         BusyIndicator {
             id: busyIndicator
             z: 5
             opacity: 1
-            
+
             anchors.left: parent.left
             anchors.top: parent.top
             width: Math.min(webviewID.width, webviewID.height);
@@ -450,13 +524,13 @@ Item {
             anchors.topMargin: (webviewID.height - busyIndicator.height)/2
             visible: false
             running: false
-            
+
             contentItem: PlasmaCore.SvgItem {
                 id: indicatorItem
                 svg: PlasmaCore.Svg {
                     imagePath: "widgets/busywidget"
                 }
-                
+
                 RotationAnimator on rotation {
                     from: 0
                     to: 360
@@ -466,11 +540,16 @@ Item {
                 }
             }
         }
+	*/
 
         function reloadFn(force) {
+	    console.log("reloadFn: ", force)
             if(reloadAnimation){
+		plasmoid.busy = true;
+		/*
                 busyIndicator.visible = true;
                 busyIndicator.running = true;
+		*/
             }
             if(force){
                 webviewID.reloadAndBypassCache()
@@ -485,6 +564,7 @@ Item {
     }
 
     function loadURLs(){
+	console.log("loadURLs")
         var arrayURLs = ConfigUtils.getURLsObjectArray();
         urlsToShow.clear();
         for (var index in arrayURLs) {
@@ -493,5 +573,5 @@ Item {
 
         main.handleSettingsUpdated();
     }
-    
+
 }

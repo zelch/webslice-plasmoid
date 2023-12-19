@@ -9,7 +9,7 @@
         <entry name="websliceUrl" type="String">
             <default>http://www.cqoicebordel.net</default>
         </entry>
-		<entry name=" zoomFactor" type="Double">
+		<entry name="zoomFactor" type="Double">
             <default>1</default>
         </entry>
 		<entry name="enableReload" type="Bool">

@@ -1,19 +1,17 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=WebSlice
+Name=ZWebSlice
 Comment=Add a slice of web on your desktop.
 Type=Service
 Icon=internet-web-browser
-X-KDE-ParentApp=
-X-KDE-PluginInfo-Author=Cqoicebordel
-X-KDE-PluginInfo-Email=cqoicebordel@gmail.com
+X-KDE-PluginInfo-Author=Liz Loss-Cutler-Hull
+X-KDE-PluginInfo-Email=warp-spam_plasmoid@aehallh.com
 X-KDE-PluginInfo-License=GPL3
-X-KDE-PluginInfo-Name=cqcb.plasma.webslice
+X-KDE-PluginInfo-Name=com.aehallh.webslice
 X-KDE-PluginInfo-Version=2.4.1
 X-KDE-PluginInfo-Website=http://www.cqoicebordel.net/webslice-plasmoid/
 X-KDE-ServiceTypes=Plasma/Applet
 X-Plasma-API=declarativeappletscript
 X-Plasma-MainScript=ui/main.qml
-X-Plasma-RemoteLocation=
 X-KDE-PluginInfo-Category=Online Services
 X-Plasma-StandAloneApp=true

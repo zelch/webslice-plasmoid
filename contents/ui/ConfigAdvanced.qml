@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.10
 import org.kde.kquickcontrols 2.0
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 Item {
 
@@ -26,7 +27,7 @@ Item {
     property alias cfg_enableJS: enableJS.checked
     property alias cfg_js: js.text
 
-    property int textfieldWidth: theme.defaultFont.pointSize * 30
+    property int textfieldWidth: PlasmaCore.Theme.defaultFont.pointSize * 30
     
     property double maxWidth: width - 22
 

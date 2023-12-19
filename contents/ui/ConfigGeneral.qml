@@ -111,6 +111,19 @@ Item {
                 from: 15
                 to: 360000
                 stepSize: 15
+		valueFromText: function(text, locale) {
+		    var text2 = text
+			.replace(/[^\-\.\d]/g, '') // Remove non digit characters
+			.replace(/\.+/g, '.') // Allow user to type '.' instead of RightArrow to enter to decimals
+			.replace(/ sec$/, '') // Remove the second abbreviation.  FIXME: i18nc
+		    var val = Number(text2)
+		    if (isNaN(val)) {
+			val = -0
+		    }
+		    // console.log('valueFromText', text, val)
+		    var factor = Math.pow(10,0)
+		    return Math.round(val * factor)
+		}
                 textFromValue: function(value, locale) {
                     return i18nc('Abbreviation for seconds', '%1 sec', value);
                 }
@@ -170,6 +183,19 @@ Item {
                     from: 10
                     to: 10000
                     stepSize: 10
+		    valueFromText: function(text, locale) {
+			var text2 = text
+			    .replace(/[^\-\.\d]/g, '') // Remove non digit characters
+			    .replace(/\.+/g, '.') // Allow user to type '.' instead of RightArrow to enter to decimals
+			    .replace(/ px$/, '') // Remove the second abbreviation.  FIXME: i18nc
+			var val = Number(text2)
+			if (isNaN(val)) {
+			    val = -0
+			}
+			// console.log('valueFromText', text, val)
+			var factor = Math.pow(10,0)
+			return Math.round(val * factor)
+		    }
                     textFromValue: function(value, locale) {
                         return i18nc('Abbreviation for pixels', '%1 px', value);
                     }
@@ -186,6 +212,19 @@ Item {
                     from: 10
                     to: 10000
                     stepSize: 10
+		    valueFromText: function(text, locale) {
+			var text2 = text
+			    .replace(/[^\-\.\d]/g, '') // Remove non digit characters
+			    .replace(/\.+/g, '.') // Allow user to type '.' instead of RightArrow to enter to decimals
+			    .replace(/ px$/, '') // Remove the second abbreviation.  FIXME: i18nc
+			var val = Number(text2)
+			if (isNaN(val)) {
+			    val = -0
+			}
+			// console.log('valueFromText', text, val)
+			var factor = Math.pow(10,0)
+			return Math.round(val * factor)
+		    }
                     textFromValue: function(value, locale) {
                         return i18nc('Abbreviation for pixels', '%1 px', value);
                     }
