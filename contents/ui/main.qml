@@ -38,8 +38,6 @@ Item {
     property double zoomFactorCfg: Plasmoid.configuration.zoomFactor
     property bool enableReload: Plasmoid.configuration.enableReload
     property int reloadIntervalSec: Plasmoid.configuration.reloadIntervalSec
-    property bool displaySiteBehaviour: Plasmoid.configuration.displaySiteBehaviour
-    property bool buttonBehaviour: Plasmoid.configuration.buttonBehaviour
     property int webPopupWidth: Plasmoid.configuration.webPopupWidth
     property int webPopupHeight: Plasmoid.configuration.webPopupHeight
     property string webPopupIcon: Plasmoid.configuration.webPopupIcon
@@ -79,7 +77,7 @@ Item {
 
     signal handleSettingsUpdated();
 
-    Plasmoid.preferredRepresentation: (displaySiteBehaviour)? Plasmoid.fullRepresentation : Plasmoid.compactRepresentation
+    Plasmoid.preferredRepresentation: Plasmoid.fullRepresentation
 
     Plasmoid.fullRepresentation: webview
 
@@ -124,8 +122,8 @@ Item {
 
         backgroundColor: backgroundColorWhite?"white":(backgroundColorTransparent?"transparent":(backgroundColorTheme?theme.viewBackgroundColor:(backgroundColorCustom?customBackgroundColor:"black")))
 
-        width: (displaySiteBehaviour) ? 0 : webPopupWidth
-        height: (displaySiteBehaviour) ? 0 : webPopupHeight
+        width: webPopupWidth
+        height: webPopupHeight
         Layout.fillWidth: fillWidthAndHeight
         Layout.fillHeight: fillWidthAndHeight
 
@@ -147,28 +145,6 @@ Item {
 
         /* Access to system palette */
         SystemPalette { id: myPalette}
-
-        /**
-         * Pin button
-         */
-        Button {
-            id: pinButton
-            x: pinButtonAlignmentLeft?y:parent.width-y-2*Math.round(units.gridUnit)
-            width: Math.round(units.gridUnit)
-            height: width
-            checkable: true
-            icon.name: "window-pin"
-            hoverEnabled: false
-            focusPolicy: Qt.NoFocus
-            checked: showPinButton
-            onCheckedChanged: showPinButton = checked
-            visible: !displaySiteBehaviour && showPinButton
-            z:1
-            palette {
-                button: showPinButton ? myPalette.highlight : myPalette.button
-            }
-        }
-
 
         /*
          * When using the shortcut to activate the Plasmoid
@@ -224,15 +200,9 @@ Item {
          * Hack to handle the size of the popup when displayed as a compactRepresentation
          */
         function updateSizeHints() {
-	    console.log("updateSizeHints")
-            //console.debug(webviewID.height + " " + webPopupHeight + " " + Plasmoid.configuration.webPopupHeight + " " +displaySiteBehaviour);
             webviewID.zoomFactor = zoomFactorCfg;
-	    webviewID.reload();
-            if(!displaySiteBehaviour){
-                webviewID.height = webPopupHeight;
-                webviewID.width = webPopupWidth;
-                //console.debug("inside" + webviewID.height + " " + webPopupHeight + " " + Plasmoid.configuration.webPopupHeight + " " +displaySiteBehaviour);
-            }
+            webviewID.reload();
+            return
         }
 
         /**
