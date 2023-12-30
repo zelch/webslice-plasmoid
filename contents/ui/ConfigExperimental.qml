@@ -15,6 +15,8 @@ Item {
     property alias cfg_notOffTheRecord: notOffTheRecord.checked
     property alias cfg_profileName: profileName.text
 
+    property alias cfg_debug: debug.checked
+
     GridLayout {
         Layout.fillWidth: true
         columns: 4
@@ -158,6 +160,19 @@ Item {
                 wrapMode: Text.Wrap
                 Layout.maximumWidth: parent.parent.width
                 Layout.columnSpan: 4
+            }
+        }
+
+        // Debug.
+        GridLayout {
+            Layout.fillWidth: true
+            Layout.columnSpan: 4
+            columns: 4
+            CheckBox {
+                id: debug
+                Layout.columnSpan: 4
+                text: i18n('Enable debug logging')
+                Layout.fillWidth: true
             }
         }
     }

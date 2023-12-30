@@ -20,3 +20,45 @@ function getURLsObjectArray() {
     }
     return JSON.parse(cfgURLS)
 }
+
+function loadString(Status) {
+    switch (Status) {
+	case WebEngineView.LoadStartedStatus:
+	    return "Started"
+	case WebEngineView.LoadStoppedStatus:
+	    return "Stopped"
+	case WebEngineView.LoadSucceededStatus:
+	    return "Succeeded"
+	case WebEngineView.LoadFailedStatus:
+	    return "Failed"
+	default:
+	    return "Unknown"
+    }
+}
+
+function navTypeString(navType) {
+    switch (navType) {
+	case WebEngineNavigationRequest.LinkClickedNavigation:
+	    return "Link Clicked"
+	case WebEngineNavigationRequest.TypedNavigation:
+	    return "Typed"
+	case WebEngineNavigationRequest.FormSubmittedNavigation:
+	    return "Form Submitted"
+	case WebEngineNavigationRequest.BackForwardNavigation:
+	    return "Back / Forward"
+	case WebEngineNavigationRequest.ReloadNavigation:
+	    return "Reload"
+	case WebEngineNavigationRequest.RedirectNavigation:
+	    return "Redirect"
+	case WebEngineNavigationRequest.OtherNavigation:
+	    return "Other"
+	default:
+	    return "Unknown"
+    }
+}
+
+function debug(entry) {
+    if (cfg_debug) {
+	console.log(entry)
+    }
+}

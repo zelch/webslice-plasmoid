@@ -75,6 +75,8 @@ Item {
     property bool notOffTheRecord: Plasmoid.configuration.notOffTheRecord
     property string profileName: Plasmoid.configuration.profileName
 
+    property bool cfg_debug: Plasmoid.configuration.debug
+
     signal handleSettingsUpdated();
 
     Plasmoid.preferredRepresentation: Plasmoid.fullRepresentation
@@ -83,16 +85,16 @@ Item {
 
     Plasmoid.icon: webPopupIcon
 
-    onUrlsModelChanged:{ console.log("onUrlsModelChanged"); loadURLs(); }
+    onUrlsModelChanged:{ ConfigUtils.debug("onUrlsModelChanged"); loadURLs(); }
 
-    onWebPopupHeightChanged:{ console.log("onWebPopupHeightChanged"); main.handleSettingsUpdated(); }
+    onWebPopupHeightChanged:{ ConfigUtils.debug("onWebPopupHeightChanged"); main.handleSettingsUpdated(); }
 
-    onWebPopupWidthChanged:{  console.log("onWebPopupWidthChanged"); main.handleSettingsUpdated(); }
+    onWebPopupWidthChanged:{  ConfigUtils.debug("onWebPopupWidthChanged"); main.handleSettingsUpdated(); }
 
-    onZoomFactorCfgChanged:{  console.log("onZoomFactorCfgChanged"); main.handleSettingsUpdated(); }
+    onZoomFactorCfgChanged:{  ConfigUtils.debug("onZoomFactorCfgChanged"); main.handleSettingsUpdated(); }
 
     onNotOffTheRecordChanged:{
-        console.log("test");
+        ConfigUtils.debug("test");
         //console.debug(Plasmoid.fullRepresentation);
         //Plasmoid.fullRepresentation = null;
         //webviewID.destroy();
@@ -129,8 +131,8 @@ Item {
 
         zoomFactor: zoomFactorCfg
 
-        onWidthChanged: updateSizeHints()
-        onHeightChanged: updateSizeHints()
+        onWidthChanged: { ConfigUtils.debug("onWidthChanged"); updateSizeHints() }
+        onHeightChanged: { ConfigUtils.debug("onHeightChanged"); updateSizeHints() }
 
         // onCertificateError: if(bypassSSLErrors){error.ignoreCertificateError()}
 
@@ -151,14 +153,14 @@ Item {
          * Thanks to https://github.com/pronobis/webslice-plasmoid/commit/07633bf508c1876d45645415dfc98b802322d407
          */
         Plasmoid.onActivated: {
-	    console.log("Plasmoid.onActivated");
+	    ConfigUtils.debug("Plasmoid.onActivated");
             if(enableReloadOnActivate){
                 reloadFn(false);
             }
         }
 
 	function onHandleSettingsUpdated() {
-	    console.log("onHandleSettingsUpdated")
+	    ConfigUtils.debug("onHandleSettingsUpdated")
 	    loadMenu();
 	    updateSizeHints();
 	}
@@ -186,7 +188,7 @@ Item {
         Shortcut {
             sequences: [StandardKey.Cancel, keysSeqStop]
             onActivated: {
-		console.log("Stop activated");
+		ConfigUtils.debug("Stop activated");
                 stop();
 		plasmoid.busy = false;
 		/*
@@ -200,6 +202,9 @@ Item {
          * Hack to handle the size of the popup when displayed as a compactRepresentation
          */
         function updateSizeHints() {
+            ConfigUtils.debug("  updateSizeHints")
+            ConfigUtils.debug("    width: " + webviewID.width + " " + webPopupWidth + " " + Plasmoid.configuration.webPopupWidth);
+            ConfigUtils.debug("    height: " + webviewID.height + " " + webPopupHeight + " " + Plasmoid.configuration.webPopupHeight);
             webviewID.zoomFactor = zoomFactorCfg;
             webviewID.reload();
             return
@@ -209,17 +214,13 @@ Item {
          * Handle everything around web request : display the busy indicator, and run JS
          */
         onLoadingChanged: {
-	    console.log("onLoadingChanged")
-	    console.log("loadRequest.status:", loadRequest.status)
-	    console.log("loadRequest.errorCode:", loadRequest.errorCode)
-	    console.log("loadRequest.errorDomain:", loadRequest.errorDomain)
-	    console.log("loadRequest.errorString:", loadRequest.errorString)
-	    console.log("loadRequest.url:", loadRequest.url)
-	    console.log("WebEngineView.LoadStartedStatus:", WebEngineView.LoadStartedStatus)
-	    console.log("WebEngineView.LoadStoppedStatus:", WebEngineView.LoadStoppedStatus)
-	    console.log("WebEngineView.LoadSucceededStatus:", WebEngineView.LoadSucceededStatus)
-	    console.log("WebEngineView.LoadFailedStatus:", WebEngineView.LoadFailedStatus)
-	    console.log("zoomFactorCfg:", zoomFactorCfg)
+	    ConfigUtils.debug("onLoadingChanged")
+	    ConfigUtils.debug("  loadRequest.status:", ConfigUtils.loadString(loadRequest.status))
+	    ConfigUtils.debug("  loadRequest.errorCode:", loadRequest.errorCode)
+	    ConfigUtils.debug("  loadRequest.errorDomain:", loadRequest.errorDomain)
+	    ConfigUtils.debug("  loadRequest.errorString:", loadRequest.errorString)
+	    ConfigUtils.debug("  loadRequest.url:", loadRequest.url)
+	    ConfigUtils.debug("  zoomFactorCfg:", zoomFactorCfg)
             webviewID.zoomFactor = zoomFactorCfg;
             if (enableScrollTo && loadRequest.status === WebEngineView.LoadSucceededStatus) {
                 runJavaScript("window.scrollTo("+scrollToX+", "+scrollToY+");");
@@ -247,21 +248,14 @@ Item {
         }
 
 	onRenderProcessPidChanged: {
-	    console.log("onRenderProcessPidChanged");
+	    ConfigUtils.debug("onRenderProcessPidChanged");
 	}
 
         /**
          * Open the middle clicked (or ctrl+clicked) link in the default browser
          */
         onNavigationRequested: {
-	    console.log("onNavigationRequested, request.action:", request.action, "isMainFrame:", request.isMainFrame, "navigationType:", request.navigationType, "url:", request.url, "isExternalLink:", isExternalLink, "zoomFactorCfg:", zoomFactorCfg)
-	    console.log("LinkClickedNavigation", WebEngineNavigationRequest.LinkClickedNavigation);
-	    console.log("TypedNavigation", WebEngineNavigationRequest.TypedNavigation);
-	    console.log("FormSubmittedNavigation", WebEngineNavigationRequest.FormSubmittedNavigation);
-	    console.log("BackForwardNavigation", WebEngineNavigationRequest.BackForwardNavigation);
-	    console.log("ReloadNavigation", WebEngineNavigationRequest.ReloadNavigation);
-	    console.log("RedirectNavigation", WebEngineNavigationRequest.RedirectNavigation);
-	    console.log("OtherNavigation", WebEngineNavigationRequest.OtherNavigation);
+	    ConfigUtils.debug("onNavigationRequested, request.action:", request.action, "isMainFrame:", request.isMainFrame, "navigationType:", ConfigUtils.navTypeString(request.navigationType), "url:", request.url, "isExternalLink:", isExternalLink, "zoomFactorCfg:", zoomFactorCfg)
             webviewID.zoomFactor = zoomFactorCfg;
             if(isExternalLink){
                 isExternalLink = false;
@@ -277,23 +271,23 @@ Item {
         }
 
 	onCertificateError: {
-	    console.log("onCertificateError, bypassSSLErrors:", bypassSSLErrors);
+	    ConfigUtils.debug("onCertificateError, bypassSSLErrors:", bypassSSLErrors);
 	    if (bypassSSLErrors) {
 		error.ignoreCertificateError()
 	    }
 	}
 
 	onWindowCloseRequested: {
-	    console.log("onWindowCloseRequested");
+	    ConfigUtils.debug("onWindowCloseRequested");
 	}
 
 	onRenderProcessTerminated: {
-	    console.log("onRenderProcessTerminated terminationStatus:", terminationStatus, "exitCode:", exitCode)
+	    ConfigUtils.debug("onRenderProcessTerminated terminationStatus:", terminationStatus, "exitCode:", exitCode)
 	}
 
         onNewViewRequested: {
-	    console.log("onNewViewRequested")
-            if(request.userInitiated){
+	    ConfigUtils.debug("onNewViewRequested")
+            if (request.userInitiated) {
                 isExternalLink = true;
             }else{
                 isExternalLink = false;
@@ -304,17 +298,18 @@ Item {
          * Show context menu
          */
         onContextMenuRequested: {
-	    console.log("onContextMenuRequested")
-	    console.log("ErrorDomain:", webviewID.ErrorDomain)
-	    console.log("Feature:", webviewID.Feature)
-	    console.log("LifecycleState:", webviewID.LifecycleState)
-	    console.log("LoadStatus:", webviewID.LoadStatus)
-	    console.log("RenderProcessTerminationStatus:", webviewID.RenderProcessTerminationStatus)
-	    console.log("WebAction:", webviewID.WebAction)
-	    console.log("loadingProgress:", webviewID.loadingProgress)
-	    console.log("loading:", webviewID.loading)
-	    console.log("title:", webviewID.title)
-	    console.log("url:", url)
+	    ConfigUtils.debug("onContextMenuRequested")
+	    ConfigUtils.debug("  ErrorDomain:", webviewID.ErrorDomain)
+	    ConfigUtils.debug("  Feature:", webviewID.Feature)
+	    ConfigUtils.debug("  LifecycleState:", webviewID.LifecycleState)
+	    ConfigUtils.debug("  LoadStatus:", webviewID.LoadStatus)
+	    ConfigUtils.debug("  RenderProcessTerminationStatus:", webviewID.RenderProcessTerminationStatus)
+	    ConfigUtils.debug("  WebAction:", webviewID.WebAction)
+	    ConfigUtils.debug("  loadingProgress:", webviewID.loadingProgress)
+	    ConfigUtils.debug("  loading:", webviewID.loading)
+	    ConfigUtils.debug("  title:", webviewID.title)
+	    ConfigUtils.debug("  url:", url)
+	    ConfigUtils.debug("  request:", request)
             request.accepted = true
             contextMenu.request = request
             contextMenu.open(request.x, request.y)
@@ -355,7 +350,7 @@ Item {
                 text: i18n('Reload')
                 icon: 'view-refresh'
                 onClicked: {
-		    console.log("Refresh clicked")
+		    ConfigUtils.debug("Refresh clicked")
                     // Force reload if Ctrl pressed
 		    if (dataSource.data.Ctrl !== undefined && dataSource.data.Ctrl.Pressed) {
                         reloadFn(true);
@@ -420,7 +415,7 @@ Item {
                 enabled: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
                 visible: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
                 onClicked: {
-		    console.log("Copy link URL clicked")
+		    ConfigUtils.debug("Copy link URL clicked")
                     copyURLTextEdit.text = contextMenu.request.linkUrl
                     copyURLTextEdit.selectAll()
                     copyURLTextEdit.copy()
@@ -443,7 +438,7 @@ Item {
         }
 
         function addEntry(stringURL) {
-	    console.log("addEntry:", stringURL)
+	    ConfigUtils.debug("addEntry:", stringURL)
             var menuItemI = menuItem.createObject(dynamicMenu, {text: stringURL, icon: 'link', "stringURL":stringURL});
             menuItemI.clicked.connect(function() { webviewID.url = stringURL; });
         }
@@ -455,7 +450,7 @@ Item {
         }
 
         function loadMenu() {
-	    console.log("loadMenu")
+	    ConfigUtils.debug("loadMenu")
             for(var i=1; i<dynamicMenu.content.length; i++){
                 dynamicMenu.content[i].visible=false;
             }
@@ -466,7 +461,7 @@ Item {
         }
 
         Component.onCompleted: {
-	    console.log("Component.onCompleted")
+	    ConfigUtils.debug("Component.onCompleted")
             loadURLs();
         }
 
@@ -475,7 +470,7 @@ Item {
             running: enableReload
             repeat: true
             onTriggered: {
-		console.log("reload triggered")
+		ConfigUtils.debug("reload triggered")
                 reloadFn(false)
             }
         }
@@ -513,7 +508,7 @@ Item {
 	*/
 
         function reloadFn(force) {
-	    console.log("reloadFn: ", force)
+	    ConfigUtils.debug("reloadFn: ", force)
             if(reloadAnimation){
 		plasmoid.busy = true;
 		/*
@@ -534,7 +529,7 @@ Item {
     }
 
     function loadURLs(){
-	console.log("loadURLs")
+	ConfigUtils.debug("loadURLs")
         var arrayURLs = ConfigUtils.getURLsObjectArray();
         urlsToShow.clear();
         for (var index in arrayURLs) {
