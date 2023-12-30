@@ -372,7 +372,7 @@ Item {
                  * Display the principal URL first, then the list
                  */
                 PlasmaComponents.ContextMenu {
-                    id:dynamicMenu
+                    id: dynamicMenu
                     visualParent: gotourls.action
                     PlasmaComponents.MenuItem {
                         text: websliceUrl
@@ -420,7 +420,7 @@ Item {
                     copyURLTextEdit.selectAll()
                     copyURLTextEdit.copy()
                 }
-                TextEdit{
+                TextEdit {
                     id: copyURLTextEdit
                     visible: false
                 }
