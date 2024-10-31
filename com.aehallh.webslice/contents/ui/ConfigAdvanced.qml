@@ -3,9 +3,10 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.10
 import org.kde.kquickcontrols 2.0
 import org.kde.plasma.core 2.0 as PlasmaCore
+import org.kde.kcmutils as KCMUtils
+import org.kde.kirigami as Kirigami
 
-Item {
-
+KCMUtils.SimpleKCM {
     property alias cfg_enableScrollTo: enableScrollTo.checked
     property alias cfg_scrollToX: scrollToX.text
     property alias cfg_scrollToY: scrollToY.text

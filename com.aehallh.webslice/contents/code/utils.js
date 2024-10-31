@@ -57,8 +57,8 @@ function navTypeString(navType) {
     }
 }
 
-function debug(entry) {
+function debug(...entry) {
     if (cfg_debug) {
-	console.log(entry)
+	console.log(...entry)
     }
 }

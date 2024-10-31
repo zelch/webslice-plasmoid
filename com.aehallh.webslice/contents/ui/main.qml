@@ -17,21 +17,22 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .        *
  ***************************************************************************/
 
-import QtQuick 2.15
-import QtWebEngine 1.11
-import QtQuick.Layouts 1.15
-import QtQuick.Controls 2.15
-import org.kde.plasma.plasma5support 2.0 as P5Support
-import org.kde.plasma.plasmoid 2.0
-import org.kde.plasma.components 2.0 as PlasmaComponents
-import org.kde.plasma.core 2.0 as PlasmaCore
-import QtQml 2.15
+import QtQuick
+import QtWebEngine
+import QtQuick.Layouts
+import QtQuick.Controls
+import org.kde.plasma.plasma5support as P5Support
+import org.kde.plasma.plasmoid
+import org.kde.plasma.components as PlasmaComponents
+import org.kde.plasma.core as PlasmaCore
+import QtQml
+import org.kde.kirigami as Kirigami
 
 import "../code/utils.js" as ConfigUtils
 
 
 
-Item {
+PlasmoidItem {
     id: main
 
     property string websliceUrl: Plasmoid.configuration.websliceUrl
@@ -79,11 +80,11 @@ Item {
 
     signal handleSettingsUpdated();
 
-    Plasmoid.preferredRepresentation: Plasmoid.fullRepresentation
+    preferredRepresentation: fullRepresentation
 
-    Plasmoid.fullRepresentation: webview
+    fullRepresentation: webview
 
-    Plasmoid.icon: webPopupIcon
+    // icon.name: webPopupIcon
 
     onUrlsModelChanged:{ ConfigUtils.debug("onUrlsModelChanged"); loadURLs(); }
 
@@ -108,11 +109,13 @@ Item {
 
     //onKeysseqChanged: { main.handleSettingsUpdated(); }
 
+    /*
     Binding {
         target: plasmoid
         property: "hideOnWindowDeactivate"
         value: !showPinButton
     }
+    */
 
 
     property Component webview: WebEngineView {
@@ -122,7 +125,7 @@ Item {
 	// anchors.fill: plasmoid.fullRepresentation
 	// anchors.fill: plasmoid.rootItem;
 
-        backgroundColor: backgroundColorWhite?"white":(backgroundColorTransparent?"transparent":(backgroundColorTheme?theme.viewBackgroundColor:(backgroundColorCustom?customBackgroundColor:"black")))
+        backgroundColor: backgroundColorWhite?"white":(backgroundColorTransparent?"transparent":(backgroundColorTheme?Kirigami.Theme.viewBackgroundColor:(backgroundColorCustom?customBackgroundColor:"black")))
 
         width: webPopupWidth
         height: webPopupHeight
@@ -161,7 +164,7 @@ Item {
 
 	function onHandleSettingsUpdated() {
 	    ConfigUtils.debug("onHandleSettingsUpdated")
-	    loadMenu();
+	    // loadMenu();
 	    updateSizeHints();
 	}
 
@@ -213,37 +216,33 @@ Item {
         /**
          * Handle everything around web request : display the busy indicator, and run JS
          */
-        onLoadingChanged: {
+        onLoadingChanged: function(loadingInfo) {
 	    ConfigUtils.debug("onLoadingChanged")
-	    ConfigUtils.debug("  loadRequest.status:", ConfigUtils.loadString(loadRequest.status))
-	    ConfigUtils.debug("  loadRequest.errorCode:", loadRequest.errorCode)
-	    ConfigUtils.debug("  loadRequest.errorDomain:", loadRequest.errorDomain)
-	    ConfigUtils.debug("  loadRequest.errorString:", loadRequest.errorString)
-	    ConfigUtils.debug("  loadRequest.url:", loadRequest.url)
+	    ConfigUtils.debug("  loadingInfo.status:", ConfigUtils.loadString(loadingInfo.status))
+	    ConfigUtils.debug("  loadingInfo.errorCode:", loadingInfo.errorCode)
+	    ConfigUtils.debug("  loadingInfo.errorDomain:", loadingInfo.errorDomain)
+	    ConfigUtils.debug("  loadingInfo.errorString:", loadingInfo.errorString)
+	    ConfigUtils.debug("  loadingInfo.url:", loadingInfo.url)
 	    ConfigUtils.debug("  zoomFactorCfg:", zoomFactorCfg)
             webviewID.zoomFactor = zoomFactorCfg;
-            if (enableScrollTo && loadRequest.status === WebEngineView.LoadSucceededStatus) {
+            if (enableScrollTo && loadingInfo.status === WebEngineView.LoadSucceededStatus) {
                 runJavaScript("window.scrollTo("+scrollToX+", "+scrollToY+");");
             }
-            if (enableJSID && loadRequest.status === WebEngineView.LoadSucceededStatus) {
+            if (enableJSID && loadingInfo.status === WebEngineView.LoadSucceededStatus) {
                 runJavaScript(jsSelector + ".scrollIntoView(true);");
             }
-            if (scrollbarsOverflow && loadRequest.status === WebEngineView.LoadSucceededStatus) {
+            if (scrollbarsOverflow && loadingInfo.status === WebEngineView.LoadSucceededStatus) {
                 runJavaScript("document.body.style.overflow='hidden';");
-            }else if (scrollbarsWebkit && loadRequest.status === WebEngineView.LoadSucceededStatus){
+            }else if (scrollbarsWebkit && loadingInfo.status === WebEngineView.LoadSucceededStatus){
                 runJavaScript("var style = document.createElement('style');
                                 style.innerHTML = `body::-webkit-scrollbar {display: none;}`;
                                 document.head.appendChild(style);");
             }
-            if (enableJS && loadRequest.status === WebEngineView.LoadSucceededStatus) {
+            if (enableJS && loadingInfo.status === WebEngineView.LoadSucceededStatus) {
                 runJavaScript(js);
             }
-            if (loadRequest && (loadRequest.status === WebEngineView.LoadSucceededStatus || loadRequest.status === WebEngineLoadRequest.LoadFailedStatus)) {
+            if (loadingInfo && (loadingInfo.status === WebEngineView.LoadSucceededStatus || loadingInfo.status === WebEngineView.LoadFailedStatus)) {
 		plasmoid.busy = false;
-		/*
-                busyIndicator.visible = false;
-                busyIndicator.running = false;
-		*/
             }
         }
 
@@ -254,14 +253,15 @@ Item {
         /**
          * Open the middle clicked (or ctrl+clicked) link in the default browser
          */
-        onNavigationRequested: {
-	    ConfigUtils.debug("onNavigationRequested, request.action:", request.action, "isMainFrame:", request.isMainFrame, "navigationType:", ConfigUtils.navTypeString(request.navigationType), "url:", request.url, "isExternalLink:", isExternalLink, "zoomFactorCfg:", zoomFactorCfg)
+        onNavigationRequested: function(request) {
+	    ConfigUtils.debug("onNavigationRequested, isMainFrame:", request.isMainFrame, "navigationType:", ConfigUtils.navTypeString(request.navigationType), "url:", request.url, "isExternalLink:", isExternalLink, "zoomFactorCfg:", zoomFactorCfg)
             webviewID.zoomFactor = zoomFactorCfg;
-            if(isExternalLink){
+            if (isExternalLink) {
                 isExternalLink = false;
-                request.action = WebEngineView.IgnoreRequest;
+		request.reject()
+                //request.action = WebEngineView.IgnoreRequest;
                 Qt.openUrlExternally(request.url);
-            }else if(reloadAnimation){
+            } else if (reloadAnimation) {
 		plasmoid.busy = true;
 		/*
                 busyIndicator.visible = true;
@@ -283,8 +283,10 @@ Item {
 
 	onRenderProcessTerminated: {
 	    ConfigUtils.debug("onRenderProcessTerminated terminationStatus:", terminationStatus, "exitCode:", exitCode)
+	    reloadFn(false)
 	}
 
+	/*
         onNewViewRequested: {
 	    ConfigUtils.debug("onNewViewRequested")
             if (request.userInitiated) {
@@ -293,11 +295,12 @@ Item {
                 isExternalLink = false;
             }
         }
+	*/
 
         /**
          * Show context menu
          */
-        onContextMenuRequested: {
+        onContextMenuRequested: function(request) {
 	    ConfigUtils.debug("onContextMenuRequested")
 	    ConfigUtils.debug("  ErrorDomain:", webviewID.ErrorDomain)
 	    ConfigUtils.debug("  Feature:", webviewID.Feature)
@@ -310,16 +313,24 @@ Item {
 	    ConfigUtils.debug("  title:", webviewID.title)
 	    ConfigUtils.debug("  url:", url)
 	    ConfigUtils.debug("  request:", request)
+	    ConfigUtils.debug("  request.x:", request.x)
+	    ConfigUtils.debug("  request.y:", request.y)
+	    ConfigUtils.debug("  contextualActions:", Plasmoid.contextualActions);
+	    /*
+	    // FIXME: We don't have any way to trigger the context menu right now.
             request.accepted = true
-            contextMenu.request = request
-            contextMenu.open(request.x, request.y)
+	    Plasmoid.contextualActionsAboutToShow()
+	    Plasmoid.showStatusNotifierContextMenu()
+	    Plasmoid.showPlasmoidMenu(main, request.x, request.y)
+	    contextMenu(request)
+	    */
         }
 
 
         /**
          * Get status of Ctrl key
          */
-         P5Support.DataSource {
+        P5Support.DataSource {
             id: dataSource
             engine: "keystate"
             connectedSources: ["Ctrl"]
@@ -328,28 +339,23 @@ Item {
         /**
          * Context menu
          */
-        PlasmaComponents.ContextMenu {
-            property var request
-            id: contextMenu
-
-            PlasmaComponents.MenuItem {
+	Plasmoid.contextualActions: [
+	    PlasmaCore.Action {
                 text: i18n('Back')
-                icon: 'draw-arrow-back'
+                icon.name: 'draw-arrow-back'
                 enabled: webviewID.canGoBack
-                onClicked: webviewID.goBack()
-            }
-
-            PlasmaComponents.MenuItem {
+                onTriggered: webviewID.goBack()
+	    },
+	    PlasmaCore.Action {
                 text: i18n('Forward')
-                icon: 'draw-arrow-forward'
+                icon.name: 'draw-arrow-forward'
                 enabled: webviewID.canGoForward
-                onClicked: webviewID.goForward()
-            }
-
-            PlasmaComponents.MenuItem {
+                onTriggered: webviewID.goForward()
+            },
+	    PlasmaCore.Action {
                 text: i18n('Reload')
-                icon: 'view-refresh'
-                onClicked: {
+                icon.name: 'view-refresh'
+                onTriggered: {
 		    ConfigUtils.debug("Refresh clicked")
                     // Force reload if Ctrl pressed
 		    if (dataSource.data.Ctrl !== undefined && dataSource.data.Ctrl.Pressed) {
@@ -358,63 +364,43 @@ Item {
                         reloadFn(false);
                     }
                 }
-            }
-
-            PlasmaComponents.MenuItem {
-                id: gotourls
-                text: i18n('Go to')
-                icon: 'go-jump'
-                visible:(urlsToShow.count>0)
-                enabled:(urlsToShow.count>0)
-
-                /**
-                 * Dynamic context menu
-                 * Display the principal URL first, then the list
-                 */
-                PlasmaComponents.ContextMenu {
-                    id: dynamicMenu
-                    visualParent: gotourls.action
-                    PlasmaComponents.MenuItem {
-                        text: websliceUrl
-                        icon: 'go-home'
-                        onClicked: webviewID.url = websliceUrl
-                    }
-                }
-            }
-
-            PlasmaComponents.MenuItem {
+            },
+	    PlasmaCore.Action {
                 text: i18n('Go Home')
-                icon: 'go-home'
+                icon.name: 'go-home'
                 visible:(urlsToShow.count==0)
                 enabled:(urlsToShow.count==0)
-                onClicked: webviewID.url = websliceUrl
-            }
+                onTriggered: webviewID.url = websliceUrl
+            },
 
-            PlasmaComponents.MenuItem {
+            PlasmaCore.Action {
                 text: i18n('Open current URL in default browser')
-                icon: 'document-share'
-                onClicked: Qt.openUrlExternally(webviewID.url)
-            }
+                icon.name: 'document-share'
+                onTriggered: Qt.openUrlExternally(webviewID.url)
+            },
 
-            PlasmaComponents.MenuItem{
+	    /*
+            PlasmaCore.Action{
                 separator: true
                 visible: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
-            }
+            },
+	    */
 
-            PlasmaComponents.MenuItem {
+            PlasmaCore.Action {
                 text: i18n('Open link\'s URL in default browser')
-                icon: 'document-share'
+                icon.name: 'document-share'
                 enabled: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
                 visible: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
-                onClicked: Qt.openUrlExternally(contextMenu.request.linkUrl)
-            }
+                onTriggered: Qt.openUrlExternally(contextMenu.request.linkUrl)
+            },
 
-            PlasmaComponents.MenuItem {
+	    /*
+            PlasmaCore.Action {
                 text: i18n('Copy link\'s URL')
-                icon: 'edit-copy'
+                icon.name: 'edit-copy'
                 enabled: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
                 visible: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
-                onClicked: {
+                onTriggered: {
 		    ConfigUtils.debug("Copy link URL clicked")
                     copyURLTextEdit.text = contextMenu.request.linkUrl
                     copyURLTextEdit.selectAll()
@@ -424,22 +410,26 @@ Item {
                     id: copyURLTextEdit
                     visible: false
                 }
-            }
+            },
+	    */
 
-            PlasmaComponents.MenuItem{
+	    /*
+            PlasmaCore.Action{
                 separator: true
-            }
+            },
+	    */
 
-            PlasmaComponents.MenuItem {
+            PlasmaCore.Action {
                 text: i18n('Configure')
-                icon: 'configure'
-                onClicked: Plasmoid.action("configure").trigger()
+                icon.name: 'configure'
+                onTriggered: Plasmoid.internalAction("configure").trigger()
             }
-        }
+	]
 
+	/*
         function addEntry(stringURL) {
 	    ConfigUtils.debug("addEntry:", stringURL)
-            var menuItemI = menuItem.createObject(dynamicMenu, {text: stringURL, icon: 'link', "stringURL":stringURL});
+            var menuItemI = menuItem.createObject(dynamicMenu, {text: stringURL, icon.name: 'link', "stringURL":stringURL});
             menuItemI.clicked.connect(function() { webviewID.url = stringURL; });
         }
 
@@ -448,7 +438,9 @@ Item {
             PlasmaComponents.MenuItem {
             }
         }
+	*/
 
+	/*
         function loadMenu() {
 	    ConfigUtils.debug("loadMenu")
             for(var i=1; i<dynamicMenu.content.length; i++){
@@ -459,6 +451,7 @@ Item {
                 var entry = addEntry(urlsToShow.get(i).url);
             }
         }
+	*/
 
         Component.onCompleted: {
 	    ConfigUtils.debug("Component.onCompleted")
@@ -474,38 +467,6 @@ Item {
                 reloadFn(false)
             }
         }
-
-	/*
-        BusyIndicator {
-            id: busyIndicator
-            z: 5
-            opacity: 1
-
-            anchors.left: parent.left
-            anchors.top: parent.top
-            width: Math.min(webviewID.width, webviewID.height);
-            height: Math.min(webviewID.width, webviewID.height);
-            anchors.leftMargin: (webviewID.width - busyIndicator.width)/2
-            anchors.topMargin: (webviewID.height - busyIndicator.height)/2
-            visible: false
-            running: false
-
-            contentItem: PlasmaCore.SvgItem {
-                id: indicatorItem
-                svg: PlasmaCore.Svg {
-                    imagePath: "widgets/busywidget"
-                }
-
-                RotationAnimator on rotation {
-                    from: 0
-                    to: 360
-                    duration:2000
-                    running: busyIndicator.running && indicatorItem.visible && indicatorItem.opacity > 0;
-                    loops: Animation.Infinite
-                }
-            }
-        }
-	*/
 
         function reloadFn(force) {
 	    ConfigUtils.debug("reloadFn: ", force)

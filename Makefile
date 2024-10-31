@@ -30,7 +30,7 @@ upload-locale-fr: ## Upload fr locale to Transifex
 plasmoid: ## Make the .plasmoid file
 	rm -f com.aehallh.webslice.plasmoid
 	cd ./com.aehallh.webslice/; \
-	zip -9 -r com.aehallh.webslice.plasmoid.zip contents/ metadata.desktop
+	zip -9 -r com.aehallh.webslice.plasmoid.zip contents/ metadata.json
 	mv ./com.aehallh.webslice/com.aehallh.webslice.plasmoid.zip ./com.aehallh.webslice.plasmoid
 
 update: ## Update the installed package

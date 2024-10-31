@@ -1,10 +1,11 @@
-import QtQuick 2.12
-import QtQuick.Controls 2.12
-import QtQuick.Layouts 1.10
-import org.kde.kquickcontrols 2.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import org.kde.kquickcontrols
+import org.kde.kcmutils as KCMUtils
+import org.kde.kirigami as Kirigami
 
-Item {
-
+KCMUtils.SimpleKCM {
     property alias cfg_websliceUrl: websliceUrl.text
     property alias cfg_zoomFactor: zoomFactor.value
     property alias cfg_enableReload: enableReload.checked

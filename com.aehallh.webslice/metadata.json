@@ -1,0 +1,21 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "warp-spam_plasmoid@aehallh.com",
+                "Name": "Liz Loss-Cutler-Hull"
+            }
+        ],
+        "Category": "Online Services",
+        "Description": "Add a slice of web on your desktop.",
+        "Icon": "internet-web-browser",
+        "Id": "com.aehallh.webslice",
+        "License": "GPL3",
+        "Name": "WebSlice (New)",
+        "Version": "2.6.0",
+        "Website": "https://www.github.com/zelch/webslice-plasmoid/"
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-StandAloneApp": true
+}
