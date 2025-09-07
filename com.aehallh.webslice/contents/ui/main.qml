@@ -79,15 +79,27 @@ PlasmoidItem {
 
     // icon.name: webPopupIcon
 
-    onUrlsModelChanged:{ ConfigUtils.debug("onUrlsModelChanged"); loadURLs(); }
+    onUrlsModelChanged: {
+        ConfigUtils.debug("onUrlsModelChanged");
+        loadURLs();
+    }
 
-    onWebPopupHeightChanged:{ ConfigUtils.debug("onWebPopupHeightChanged"); main.handleSettingsUpdated(); }
+    onWebPopupHeightChanged: {
+        ConfigUtils.debug("onWebPopupHeightChanged");
+        main.handleSettingsUpdated();
+    }
 
-    onWebPopupWidthChanged:{  ConfigUtils.debug("onWebPopupWidthChanged"); main.handleSettingsUpdated(); }
+    onWebPopupWidthChanged: {
+        ConfigUtils.debug("onWebPopupWidthChanged");
+        main.handleSettingsUpdated();
+    }
 
-    onZoomFactorCfgChanged:{  ConfigUtils.debug("onZoomFactorCfgChanged"); main.handleSettingsUpdated(); }
+    onZoomFactorCfgChanged: {
+        ConfigUtils.debug("onZoomFactorCfgChanged");
+        main.handleSettingsUpdated();
+    }
 
-    onNotOffTheRecordChanged:{
+    onNotOffTheRecordChanged: {
         ConfigUtils.debug("test");
         //console.debug(Plasmoid.fullRepresentation);
         //Plasmoid.fullRepresentation = null;
@@ -138,46 +150,53 @@ PlasmoidItem {
 
         zoomFactor: zoomFactorCfg
 
-        onWidthChanged: { ConfigUtils.debug("onWidthChanged"); updateSizeHints() }
-        onHeightChanged: { ConfigUtils.debug("onHeightChanged"); updateSizeHints() }
+        onWidthChanged: {
+            ConfigUtils.debug("onWidthChanged");
+            updateSizeHints();
+        }
+        onHeightChanged: {
+            ConfigUtils.debug("onHeightChanged");
+            updateSizeHints();
+        }
 
         // onCertificateError: if(bypassSSLErrors){error.ignoreCertificateError()}
 
         property bool isExternalLink: false
 
-        profile:  WebEngineProfile{
-            httpUserAgent: (enableCustomUA)?customUA:httpUserAgent
+        profile: WebEngineProfile {
+            httpUserAgent: (enableCustomUA) ? customUA : httpUserAgent
             offTheRecord: !notOffTheRecord
-            storageName: (notOffTheRecord)?profileName:"webslice-data"
+            storageName: (notOffTheRecord) ? profileName : "webslice-data"
         }
 
-
         /* Access to system palette */
-        SystemPalette { id: myPalette}
+        SystemPalette {
+            id: myPalette
+        }
 
         /*
          * When using the shortcut to activate the Plasmoid
          * Thanks to https://github.com/pronobis/webslice-plasmoid/commit/07633bf508c1876d45645415dfc98b802322d407
          */
         Plasmoid.onActivated: {
-	    ConfigUtils.debug("Plasmoid.onActivated");
-            if(enableReloadOnActivate){
+            ConfigUtils.debug("Plasmoid.onActivated");
+            if (enableReloadOnActivate) {
                 reloadFn(false);
             }
         }
 
-	function onHandleSettingsUpdated() {
-	    ConfigUtils.debug("onHandleSettingsUpdated")
-	    // loadMenu();
-	    updateSizeHints();
-	}
+        function onHandleSettingsUpdated() {
+            ConfigUtils.debug("onHandleSettingsUpdated");
+            // loadMenu();
+            updateSizeHints();
+        }
 
         Connections {
             target: main
         }
 
         Shortcut {
-            id:shortreload
+            id: shortreload
             sequences: [StandardKey.Refresh, keysSeqReload]
             onActivated: reloadFn(false)
         }
@@ -195,10 +214,10 @@ PlasmoidItem {
         Shortcut {
             sequences: [StandardKey.Cancel, keysSeqStop]
             onActivated: {
-		ConfigUtils.debug("Stop activated");
+                ConfigUtils.debug("Stop activated");
                 stop();
-		plasmoid.busy = false;
-		/*
+                plasmoid.busy = false;
+                /*
                 busyIndicator.visible = false;
                 busyIndicator.running = false;
 		*/
@@ -209,35 +228,35 @@ PlasmoidItem {
          * Hack to handle the size of the popup when displayed as a compactRepresentation
          */
         function updateSizeHints() {
-            ConfigUtils.debug("  updateSizeHints")
+            ConfigUtils.debug("  updateSizeHints");
             ConfigUtils.debug("    width: " + webviewID.width + " " + webPopupWidth + " " + Plasmoid.configuration.webPopupWidth);
             ConfigUtils.debug("    height: " + webviewID.height + " " + webPopupHeight + " " + Plasmoid.configuration.webPopupHeight);
             webviewID.zoomFactor = zoomFactorCfg;
             webviewID.reload();
-            return
+            return;
         }
 
         /**
          * Handle everything around web request : display the busy indicator, and run JS
          */
-        onLoadingChanged: function(loadingInfo) {
-	    ConfigUtils.debug("onLoadingChanged")
-	    ConfigUtils.debug("  loadingInfo.status:", ConfigUtils.loadString(loadingInfo.status))
-	    ConfigUtils.debug("  loadingInfo.errorCode:", loadingInfo.errorCode)
-	    ConfigUtils.debug("  loadingInfo.errorDomain:", loadingInfo.errorDomain)
-	    ConfigUtils.debug("  loadingInfo.errorString:", loadingInfo.errorString)
-	    ConfigUtils.debug("  loadingInfo.url:", loadingInfo.url)
-	    ConfigUtils.debug("  zoomFactorCfg:", zoomFactorCfg)
+        onLoadingChanged: function (loadingInfo) {
+            ConfigUtils.debug("onLoadingChanged");
+            ConfigUtils.debug("  loadingInfo.status:", ConfigUtils.loadString(loadingInfo.status));
+            ConfigUtils.debug("  loadingInfo.errorCode:", loadingInfo.errorCode);
+            ConfigUtils.debug("  loadingInfo.errorDomain:", loadingInfo.errorDomain);
+            ConfigUtils.debug("  loadingInfo.errorString:", loadingInfo.errorString);
+            ConfigUtils.debug("  loadingInfo.url:", loadingInfo.url);
+            ConfigUtils.debug("  zoomFactorCfg:", zoomFactorCfg);
             webviewID.zoomFactor = zoomFactorCfg;
             if (enableScrollTo && loadingInfo.status === WebEngineView.LoadSucceededStatus) {
-                runJavaScript("window.scrollTo("+scrollToX+", "+scrollToY+");");
+                runJavaScript("window.scrollTo(" + scrollToX + ", " + scrollToY + ");");
             }
             if (enableJSID && loadingInfo.status === WebEngineView.LoadSucceededStatus) {
                 runJavaScript(jsSelector + ".scrollIntoView(true);");
             }
             if (scrollbarsOverflow && loadingInfo.status === WebEngineView.LoadSucceededStatus) {
                 runJavaScript("document.body.style.overflow='hidden';");
-            }else if (scrollbarsWebkit && loadingInfo.status === WebEngineView.LoadSucceededStatus){
+            } else if (scrollbarsWebkit && loadingInfo.status === WebEngineView.LoadSucceededStatus) {
                 runJavaScript("var style = document.createElement('style');
                                 style.innerHTML = `body::-webkit-scrollbar {display: none;}`;
                                 document.head.appendChild(style);");
@@ -246,51 +265,51 @@ PlasmoidItem {
                 runJavaScript(js);
             }
             if (loadingInfo && (loadingInfo.status === WebEngineView.LoadSucceededStatus || loadingInfo.status === WebEngineView.LoadFailedStatus)) {
-		plasmoid.busy = false;
+                plasmoid.busy = false;
             }
         }
 
-	onRenderProcessPidChanged: {
-	    ConfigUtils.debug("onRenderProcessPidChanged");
-	}
+        onRenderProcessPidChanged: {
+            ConfigUtils.debug("onRenderProcessPidChanged");
+        }
 
         /**
          * Open the middle clicked (or ctrl+clicked) link in the default browser
          */
-        onNavigationRequested: function(request) {
-	    ConfigUtils.debug("onNavigationRequested, isMainFrame:", request.isMainFrame, "navigationType:", ConfigUtils.navTypeString(request.navigationType), "url:", request.url, "isExternalLink:", isExternalLink, "zoomFactorCfg:", zoomFactorCfg)
+        onNavigationRequested: function (request) {
+            ConfigUtils.debug("onNavigationRequested, isMainFrame:", request.isMainFrame, "navigationType:", ConfigUtils.navTypeString(request.navigationType), "url:", request.url, "isExternalLink:", isExternalLink, "zoomFactorCfg:", zoomFactorCfg);
             webviewID.zoomFactor = zoomFactorCfg;
             if (isExternalLink) {
                 isExternalLink = false;
-		request.reject()
+                request.reject();
                 //request.action = WebEngineView.IgnoreRequest;
                 Qt.openUrlExternally(request.url);
             } else if (reloadAnimation) {
-		plasmoid.busy = true;
-		/*
+                plasmoid.busy = true;
+                /*
                 busyIndicator.visible = true;
                 busyIndicator.running = true;
 		*/
             }
         }
 
-	onCertificateError: {
-	    ConfigUtils.debug("onCertificateError, bypassSSLErrors:", bypassSSLErrors);
-	    if (bypassSSLErrors) {
-		error.ignoreCertificateError()
-	    }
-	}
+        onCertificateError: {
+            ConfigUtils.debug("onCertificateError, bypassSSLErrors:", bypassSSLErrors);
+            if (bypassSSLErrors) {
+                error.ignoreCertificateError();
+            }
+        }
 
-	onWindowCloseRequested: {
-	    ConfigUtils.debug("onWindowCloseRequested");
-	}
+        onWindowCloseRequested: {
+            ConfigUtils.debug("onWindowCloseRequested");
+        }
 
-	onRenderProcessTerminated: {
-	    ConfigUtils.debug("onRenderProcessTerminated terminationStatus:", terminationStatus, "exitCode:", exitCode)
-	    reloadFn(false)
-	}
+        onRenderProcessTerminated: {
+            ConfigUtils.debug("onRenderProcessTerminated terminationStatus:", terminationStatus, "exitCode:", exitCode);
+            reloadFn(false);
+        }
 
-	/*
+        /*
         onNewViewRequested: {
 	    ConfigUtils.debug("onNewViewRequested")
             if (request.userInitiated) {
@@ -343,26 +362,28 @@ PlasmoidItem {
         /**
          * Context menu
          */
-	Plasmoid.contextualActions: [
-	    PlasmaCore.Action {
+        Menu {
+            id: contextMenu
+
+            MenuItem {
                 text: i18n('Back')
                 icon.name: 'draw-arrow-back'
                 enabled: webviewID.canGoBack
                 onTriggered: webviewID.goBack()
-	    },
-	    PlasmaCore.Action {
+            }
+            MenuItem {
                 text: i18n('Forward')
                 icon.name: 'draw-arrow-forward'
                 enabled: webviewID.canGoForward
                 onTriggered: webviewID.goForward()
-            },
-	    PlasmaCore.Action {
+            }
+            MenuItem {
                 text: i18n('Reload')
                 icon.name: 'view-refresh'
                 onTriggered: {
-		    ConfigUtils.debug("Refresh clicked")
+                    ConfigUtils.debug("Refresh clicked");
                     // Force reload if Ctrl pressed
-		    if (dataSource.data.Ctrl !== undefined && dataSource.data.Ctrl.Pressed) {
+                    if (dataSource.data.Ctrl !== undefined && dataSource.data.Ctrl.Pressed) {
                         reloadFn(true);
                     } else {
                         reloadFn(false);
@@ -428,9 +449,9 @@ PlasmoidItem {
                 icon.name: 'configure'
                 onTriggered: Plasmoid.internalAction("configure").trigger()
             }
-	]
+        ]
 
-	/*
+        /*
         function addEntry(stringURL) {
 	    ConfigUtils.debug("addEntry:", stringURL)
             var menuItemI = menuItem.createObject(dynamicMenu, {text: stringURL, icon.name: 'link', "stringURL":stringURL});
@@ -444,7 +465,7 @@ PlasmoidItem {
         }
 	*/
 
-	/*
+        /*
         function loadMenu() {
 	    ConfigUtils.debug("loadMenu")
             for(var i=1; i<dynamicMenu.content.length; i++){
@@ -458,7 +479,7 @@ PlasmoidItem {
 	*/
 
         Component.onCompleted: {
-	    ConfigUtils.debug("Component.onCompleted")
+            ConfigUtils.debug("Component.onCompleted");
             loadURLs();
         }
 
@@ -467,23 +488,23 @@ PlasmoidItem {
             running: enableReload
             repeat: true
             onTriggered: {
-		ConfigUtils.debug("reload triggered")
-                reloadFn(false)
+                ConfigUtils.debug("reload triggered");
+                reloadFn(false);
             }
         }
 
         function reloadFn(force) {
-	    ConfigUtils.debug("reloadFn: ", force)
-            if(reloadAnimation){
-		plasmoid.busy = true;
-		/*
+            ConfigUtils.debug("reloadFn: ", force);
+            if (reloadAnimation) {
+                plasmoid.busy = true;
+                /*
                 busyIndicator.visible = true;
                 busyIndicator.running = true;
 		*/
             }
-            if(force){
-                webviewID.reloadAndBypassCache()
-            }else{
+            if (force) {
+                webviewID.reloadAndBypassCache();
+            } else {
                 webviewID.reload();
             }
         }
@@ -493,15 +514,16 @@ PlasmoidItem {
         id: urlsToShow
     }
 
-    function loadURLs(){
-	ConfigUtils.debug("loadURLs")
+    function loadURLs() {
+        ConfigUtils.debug("loadURLs");
         var arrayURLs = ConfigUtils.getURLsObjectArray();
         urlsToShow.clear();
         for (var index in arrayURLs) {
-            urlsToShow.append({"url":arrayURLs[index]});
+            urlsToShow.append({
+                "url": arrayURLs[index]
+            });
         }
 
         main.handleSettingsUpdated();
     }
-
 }
