@@ -323,32 +323,28 @@ PlasmoidItem {
         /**
          * Show context menu
          */
-        onContextMenuRequested: function(request) {
-	    ConfigUtils.debug("onContextMenuRequested")
-	    ConfigUtils.debug("  ErrorDomain:", webviewID.ErrorDomain)
-	    ConfigUtils.debug("  Feature:", webviewID.Feature)
-	    ConfigUtils.debug("  LifecycleState:", webviewID.LifecycleState)
-	    ConfigUtils.debug("  LoadStatus:", webviewID.LoadStatus)
-	    ConfigUtils.debug("  RenderProcessTerminationStatus:", webviewID.RenderProcessTerminationStatus)
-	    ConfigUtils.debug("  WebAction:", webviewID.WebAction)
-	    ConfigUtils.debug("  loadingProgress:", webviewID.loadingProgress)
-	    ConfigUtils.debug("  loading:", webviewID.loading)
-	    ConfigUtils.debug("  title:", webviewID.title)
-	    ConfigUtils.debug("  url:", url)
-	    ConfigUtils.debug("  request:", request)
-	    ConfigUtils.debug("  request.x:", request.x)
-	    ConfigUtils.debug("  request.y:", request.y)
-	    ConfigUtils.debug("  contextualActions:", Plasmoid.contextualActions);
-	    /*
-	    // FIXME: We don't have any way to trigger the context menu right now.
-            request.accepted = true
-	    Plasmoid.contextualActionsAboutToShow()
-	    Plasmoid.showStatusNotifierContextMenu()
-	    Plasmoid.showPlasmoidMenu(main, request.x, request.y)
-	    contextMenu(request)
-	    */
-        }
+        onContextMenuRequested: function (request) {
+            /*
+            ConfigUtils.debug("onContextMenuRequested");
+            ConfigUtils.debug("  ErrorDomain:", webviewID.ErrorDomain);
+            ConfigUtils.debug("  Feature:", webviewID.Feature);
+            ConfigUtils.debug("  LifecycleState:", webviewID.LifecycleState);
+            ConfigUtils.debug("  LoadStatus:", webviewID.LoadStatus);
+            ConfigUtils.debug("  RenderProcessTerminationStatus:", webviewID.RenderProcessTerminationStatus);
+            ConfigUtils.debug("  WebAction:", webviewID.WebAction);
+            ConfigUtils.debug("  loadingProgress:", webviewID.loadingProgress);
+            ConfigUtils.debug("  loading:", webviewID.loading);
+            ConfigUtils.debug("  title:", webviewID.title);
+            ConfigUtils.debug("  url:", url);
+            ConfigUtils.debug("  request:", request);
+            ConfigUtils.debug("  request.x:", request.x);
+            ConfigUtils.debug("  request.y:", request.y);
+            ConfigUtils.debug("  contextualActions:", Plasmoid.contextualActions);
+            */
 
+            request.accepted = true;
+            contextMenu.popup(request.x, request.y, webviewID);
+        }
 
         /**
          * Get status of Ctrl key
@@ -389,67 +385,68 @@ PlasmoidItem {
                         reloadFn(false);
                     }
                 }
-            },
-	    PlasmaCore.Action {
+            }
+            MenuItem {
                 text: i18n('Go Home')
                 icon.name: 'go-home'
-                visible:(urlsToShow.count==0)
-                enabled:(urlsToShow.count==0)
+                visible: (urlsToShow.count == 0)
+                enabled: (urlsToShow.count == 0)
                 onTriggered: webviewID.url = websliceUrl
-            },
-
-            PlasmaCore.Action {
+            }
+            MenuItem {
                 text: i18n('Open current URL in default browser')
                 icon.name: 'document-share'
                 onTriggered: Qt.openUrlExternally(webviewID.url)
-            },
+            }
 
-	    /*
-            PlasmaCore.Action{
-                separator: true
-                visible: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
-            },
-	    */
+            /*
+             PlasmaCore.Action{
+                 separator: true
+                 visible: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
+             }
+             */
 
-            PlasmaCore.Action {
-                text: i18n('Open link\'s URL in default browser')
-                icon.name: 'document-share'
-                enabled: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
-                visible: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
-                onTriggered: Qt.openUrlExternally(contextMenu.request.linkUrl)
-            },
+            /*
+             MenuItem {
+                 text: i18n('Open link\'s URL in default browser')
+                 icon.name: 'document-share'
+                 enabled: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
+                 visible: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
+                 onTriggered: Qt.openUrlExternally(contextMenu.request.linkUrl)
+             }
+             */
 
-	    /*
-            PlasmaCore.Action {
-                text: i18n('Copy link\'s URL')
-                icon.name: 'edit-copy'
-                enabled: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
-                visible: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
-                onTriggered: {
-		    ConfigUtils.debug("Copy link URL clicked")
-                    copyURLTextEdit.text = contextMenu.request.linkUrl
-                    copyURLTextEdit.selectAll()
-                    copyURLTextEdit.copy()
-                }
-                TextEdit {
-                    id: copyURLTextEdit
-                    visible: false
-                }
-            },
-	    */
+            /*
+             MenuItem {
+                 text: i18n('Copy link\'s URL')
+                 icon.name: 'edit-copy'
+                 enabled: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
+                 visible: (typeof contextMenu.request !== "undefined" && contextMenu.request.linkUrl && contextMenu.request.linkUrl != "")
+                 onTriggered: {
+                     ConfigUtils.debug("Copy link URL clicked")
+                     copyURLTextEdit.text = contextMenu.request.linkUrl
+                     copyURLTextEdit.selectAll()
+                     copyURLTextEdit.copy()
+                 }
+                 TextEdit {
+                     id: copyURLTextEdit
+                     visible: false
+                 }
+             }
+             */
 
-	    /*
-            PlasmaCore.Action{
-                separator: true
-            },
-	    */
+            /*
+             PlasmaCore.Action{
+                 separator: true
+             }
+             */
 
-            PlasmaCore.Action {
+            MenuItem {
                 text: i18n('Configure')
                 icon.name: 'configure'
                 onTriggered: Plasmoid.internalAction("configure").trigger()
             }
-        ]
+        }
 
         /*
         function addEntry(stringURL) {
