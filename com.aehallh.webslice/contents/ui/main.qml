@@ -30,8 +30,6 @@ import org.kde.kirigami as Kirigami
 
 import "../code/utils.js" as ConfigUtils
 
-
-
 PlasmoidItem {
     id: main
 
@@ -45,11 +43,6 @@ PlasmoidItem {
     property bool showPinButton: Plasmoid.configuration.showPinButton
     property bool pinButtonAlignmentLeft: Plasmoid.configuration.pinButtonAlignmentLeft
     property bool reloadAnimation: Plasmoid.configuration.reloadAnimation
-    property bool backgroundColorWhite: Plasmoid.configuration.backgroundColorWhite
-    property bool backgroundColorTransparent: Plasmoid.configuration.backgroundColorTransparent
-    property bool backgroundColorTheme: Plasmoid.configuration.backgroundColorTheme
-    property bool backgroundColorCustom: Plasmoid.configuration.backgroundColorCustom
-    property string customBackgroundColor: Plasmoid.configuration.customBackgroundColor
 
     property bool enableScrollTo: Plasmoid.configuration.enableScrollTo
     property int scrollToX: Plasmoid.configuration.scrollToX
@@ -78,7 +71,7 @@ PlasmoidItem {
 
     property bool cfg_debug: Plasmoid.configuration.debug
 
-    signal handleSettingsUpdated();
+    signal handleSettingsUpdated
 
     preferredRepresentation: fullRepresentation
 
@@ -117,15 +110,26 @@ PlasmoidItem {
     }
     */
 
-
     property Component webview: WebEngineView {
         id: webviewID
         url: websliceUrl
         // anchors.fill: parent
-	// anchors.fill: plasmoid.fullRepresentation
-	// anchors.fill: plasmoid.rootItem;
+        // anchors.fill: plasmoid.fullRepresentation
+        // anchors.fill: plasmoid.rootItem;
 
-        backgroundColor: backgroundColorWhite?"white":(backgroundColorTransparent?"transparent":(backgroundColorTheme?Kirigami.Theme.viewBackgroundColor:(backgroundColorCustom?customBackgroundColor:"black")))
+        backgroundColor: getBackgroundColor()
+        // backgroundColor: backgroundColorWhite ? "white" : (backgroundColorTransparent ? "transparent" : (backgroundColorTheme ? Kirigami.Theme.viewBackgroundColor : (backgroundColorCustom ? customBackgroundColor : "black")))
+
+        function getBackgroundColor() {
+            switch (Plasmoid.configuration.backgroundColor) {
+            case "theme":
+                return Kirigami.Theme.backgroundColor;
+            case "custom":
+                return Plasmoid.configuration.customBackgroundColor;
+            default:
+                return Plasmoid.configuration.backgroundColor;
+            }
+        }
 
         width: webPopupWidth
         height: webPopupHeight

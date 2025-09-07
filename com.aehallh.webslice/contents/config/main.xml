@@ -39,17 +39,9 @@
 		<entry name="reloadAnimation" type="Bool">
             <default>true</default>
         </entry>
-		<entry name="backgroundColorWhite" type="Bool">
-            <default>false</default>
-        </entry>
-		<entry name="backgroundColorTransparent" type="Bool">
-            <default>false</default>
-        </entry>
-		<entry name="backgroundColorTheme" type="Bool">
-            <default>true</default>
-        </entry>
-		<entry name="backgroundColorCustom" type="Bool">
-            <default>false</default>
+        <entry name="backgroundColor" type="String">
+            <label>Plasmoid background color</label>
+            <default>black</default>
         </entry>
 		<entry name="customBackgroundColor" type="String">
             <default>#000000</default>

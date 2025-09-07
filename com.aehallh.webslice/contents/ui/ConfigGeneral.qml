@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import org.kde.kquickcontrols
 import org.kde.kcmutils as KCMUtils
 import org.kde.kirigami as Kirigami
+import "./libconfig" as LibConfig
 
 KCMUtils.SimpleKCM {
     property alias cfg_websliceUrl: websliceUrl.text
@@ -13,10 +14,6 @@ KCMUtils.SimpleKCM {
 
     property alias cfg_reloadAnimation: reloadAnimation.checked
 
-    property alias cfg_backgroundColorWhite: backgroundColorWhite.checked
-    property alias cfg_backgroundColorTransparent: backgroundColorTransparent.checked
-    property alias cfg_backgroundColorTheme: backgroundColorTheme.checked
-    property alias cfg_backgroundColorCustom: backgroundColorCustom.checked
     property alias cfg_customBackgroundColor: customBackgroundColor.color
     
     property double maxWidth: width - 22
@@ -145,40 +142,26 @@ KCMUtils.SimpleKCM {
                 text: i18n('Plasmoid background color :')
             }
             
-            ButtonGroup {
-                id: backgroundColorGroup
-            }
-
             ColumnLayout {
-
-                RadioButton {
-                    id: backgroundColorWhite
-                    text: i18n("White")
-                    ButtonGroup.group: backgroundColorGroup
+                LibConfig.ComboBox {
+                    Kirigami.FormData.label: i18n("Plasmoid background color:")
+                    configKey: "backgroundColor"
+                    model: [
+                        { value: "white", text: i18n("White") },
+                        { value: "black", text: i18n("Black") },
+                        { value: "theme", text: i18n("Theme's background color") },
+                        { value: "transparent", text: i18n("Transparent <i>(⚠ might cause drawing issues)</i>") },
+                        { value: "custom", text: i18n("Custom") },
+                    ]
                 }
 
-                RadioButton {
-                    id: backgroundColorTransparent
-                    text: i18n("Transparent <i>(⚠ might cause drawing issues)</i>")
-                    ButtonGroup.group: backgroundColorGroup
-                }
-                
-                RadioButton {
-                    id: backgroundColorTheme
-                    text: i18n("Theme's background color")
-                    ButtonGroup.group: backgroundColorGroup
-                }
-                
-                RowLayout{
-                    RadioButton {
-                        id: backgroundColorCustom
-                        text: i18n("Custom")
-                        ButtonGroup.group: backgroundColorGroup
-                    }
-                    ColorButton {
-                        id: customBackgroundColor
-                        showAlphaChannel:true
-                        enabled: backgroundColorCustom.checked
+                ColorButton {
+                    id: customBackgroundColor
+                    showAlphaChannel:true
+                    visible: plasmoid.configuration.backgroundColor == "custom"
+                    onColorChanged: {
+                        console.log("Color changed", color);
+                        plasmoid.configuration.customBackgroundColor = color;
                     }
                 }
             }
