@@ -3,7 +3,7 @@
         "Authors": [
             {
                 "Email": "warp-spam_plasmoid@aehallh.com",
-                "Name": "Liz Loss-Cutler-Hull"
+                "Name": "Elizabeth Loss-Cutler-Hull"
             }
         ],
         "Category": "Online Services",
@@ -12,7 +12,7 @@
         "Id": "com.aehallh.webslice",
         "License": "GPL3",
         "Name": "WebSlice (New)",
-        "Version": "2.6.0",
+        "Version": "2.6.1",
         "Website": "https://www.github.com/zelch/webslice-plasmoid/"
     },
     "KPackageStructure": "Plasma/Applet",

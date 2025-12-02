@@ -10,26 +10,26 @@ KCMUtils.SimpleKCM {
     property alias cfg_enableScrollTo: enableScrollTo.checked
     property alias cfg_scrollToX: scrollToX.text
     property alias cfg_scrollToY: scrollToY.text
-    
+
     property alias cfg_enableJSID: enableJSID.checked
     property alias cfg_jsSelector: jsSelector.text
-    
+
     property alias cfg_enableCustomUA: enableCustomUA.checked
     property alias cfg_customUA: customUA.text
-    
+
     property alias cfg_enableReloadOnActivate: enableReloadOnActivate.checked
-    
+
     property alias cfg_bypassSSLErrors: bypassSSLErrors.checked
-    
+
     property alias cfg_scrollbarsShow: scrollbarsShow.checked
     property alias cfg_scrollbarsOverflow: scrollbarsOverflow.checked
     property alias cfg_scrollbarsWebkit: scrollbarsWebkit.checked
-    
+
     property alias cfg_enableJS: enableJS.checked
     property alias cfg_js: js.text
 
     property int textfieldWidth: PlasmaCore.Theme.defaultFont.pointSize * 30
-    
+
     property double maxWidth: width - 22
 
     GridLayout {
@@ -39,29 +39,29 @@ KCMUtils.SimpleKCM {
         rowSpacing: 25
 
         // Scroll To Position
-        GridLayout{
+        GridLayout {
             Layout.fillWidth: true
             Layout.columnSpan: 4
             columns: 5
-            
+
             CheckBox {
                 id: enableScrollTo
                 Layout.columnSpan: 5
                 text: i18n('Scroll to a fixed position')
                 Layout.fillWidth: true
             }
-            
+
             Label {
                 text: i18n('Scroll To : ')
                 Layout.columnSpan: 1
                 enabled: enableScrollTo.checked
                 Layout.fillWidth: true
             }
-            
-            GridLayout{
+
+            GridLayout {
                 Layout.columnSpan: 2
                 columns: 3
-                
+
                 Label {
                     text: i18n('X :')
                     enabled: enableScrollTo.checked
@@ -71,7 +71,7 @@ KCMUtils.SimpleKCM {
                     id: scrollToX
                     placeholderText: '0'
                     Layout.fillWidth: true
-                    Layout.minimumWidth:30
+                    Layout.minimumWidth: 30
                     enabled: enableScrollTo.checked
                     horizontalAlignment: TextInput.AlignRight
                     inputMethodHints: Qt.ImhDigitsOnly
@@ -87,21 +87,21 @@ KCMUtils.SimpleKCM {
                     Layout.columnSpan: 1
                 }
             }
-            
-            GridLayout{
+
+            GridLayout {
                 Layout.columnSpan: 2
                 columns: 3
-                
+
                 Label {
                     text: i18n('Y :')
                     enabled: enableScrollTo.checked
-                   Layout.columnSpan: 1
+                    Layout.columnSpan: 1
                 }
                 TextField {
                     id: scrollToY
                     placeholderText: '0'
                     Layout.fillWidth: true
-                    Layout.minimumWidth:30
+                    Layout.minimumWidth: 30
                     enabled: enableScrollTo.checked
                     horizontalAlignment: TextInput.AlignRight
                     inputMethodHints: Qt.ImhDigitsOnly
@@ -120,11 +120,11 @@ KCMUtils.SimpleKCM {
         }
 
         // Scroll to view
-        GridLayout{
+        GridLayout {
             Layout.fillWidth: true
             Layout.columnSpan: 4
             columns: 4
-            
+
             CheckBox {
                 id: enableJSID
                 Layout.columnSpan: 4
@@ -149,11 +149,11 @@ KCMUtils.SimpleKCM {
         }
 
         // UA
-        GridLayout{
+        GridLayout {
             Layout.fillWidth: true
             Layout.columnSpan: 4
             columns: 4
-            
+
             CheckBox {
                 id: enableCustomUA
                 Layout.columnSpan: 4
@@ -178,37 +178,37 @@ KCMUtils.SimpleKCM {
         }
 
         // Reload on Activate
-        GridLayout{
+        GridLayout {
             Layout.fillWidth: true
             Layout.columnSpan: 4
             columns: 1
-            
+
             CheckBox {
                 id: enableReloadOnActivate
                 text: i18n('Reload the page when activated through the global shortcut')
                 Layout.fillWidth: true
             }
         }
-        
+
         // Bypass SSL errors
-        GridLayout{
+        GridLayout {
             Layout.fillWidth: true
             Layout.columnSpan: 4
             columns: 1
-            
+
             CheckBox {
                 id: bypassSSLErrors
                 text: i18nc('Setting, checkbox, to ignore HTTPS errors, and display the page', 'Bypass Certificates/SSL/TLS errors')
                 Layout.fillWidth: true
             }
         }
-        
+
         // Show scrollbars
-        GridLayout{
+        GridLayout {
             Layout.fillWidth: true
             Layout.columnSpan: 4
             columns: 1
-            
+
             ButtonGroup {
                 buttons: scrollbarsGroup.children
             }
@@ -234,11 +234,11 @@ KCMUtils.SimpleKCM {
         }
 
         // UserJS
-        GridLayout{
+        GridLayout {
             Layout.fillWidth: true
             Layout.columnSpan: 4
             columns: 4
-            
+
             CheckBox {
                 id: enableJS
                 Layout.columnSpan: 4
