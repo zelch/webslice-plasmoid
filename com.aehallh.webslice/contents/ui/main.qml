@@ -101,16 +101,7 @@ Plasmoid.PlasmoidItem {
 
     onNotOffTheRecordChanged: {
         ConfigUtils.debug("onNotOffTheRecordChanged");
-        webview.reloadFn(true);
-        //console.debug(Plasmoid.fullRepresentation);
-        //Plasmoid.fullRepresentation = null;
-        //webviewID.destroy();
-        //var component = Qt.createComponent("WebviewWebslice.qml");
-        //webview = component.createObject(webview, {id: "webviewID"});
-        //Plasmoid.fullRepresentation=component;
-        //webview = component.createObject(webview);
-        //webview.createObject(WebviewWebslice);
-        //webview = webviewTemp;
+        main.handleSettingsUpdated();
     }
 
     //onKeysseqChanged: { main.handleSettingsUpdated(); }
@@ -149,11 +140,11 @@ Plasmoid.PlasmoidItem {
 
         onWidthChanged: {
             ConfigUtils.debug("onWidthChanged");
-            updateSizeHints();
+            updateSizeHints("width-changed");
         }
         onHeightChanged: {
             ConfigUtils.debug("onHeightChanged");
-            updateSizeHints();
+            updateSizeHints("height-changed");
         }
 
         // onCertificateError: if(bypassSSLErrors){error.ignoreCertificateError()}
@@ -185,7 +176,7 @@ Plasmoid.PlasmoidItem {
         function onHandleSettingsUpdated() {
             ConfigUtils.debug("onHandleSettingsUpdated");
             // loadMenu();
-            updateSizeHints();
+            updateSizeHints("settings-updated");
         }
 
         Connections {
@@ -195,7 +186,7 @@ Plasmoid.PlasmoidItem {
         Shortcut {
             id: shortreload
             sequences: [StandardKey.Refresh, main.keysSeqReload]
-            onActivated: webviewID.reloadFn(false)
+            onActivated: webviewID.reloadFn(false, "shortcut")
         }
 
         Shortcut {
@@ -212,27 +203,43 @@ Plasmoid.PlasmoidItem {
             sequences: [StandardKey.Cancel, main.keysSeqStop]
             onActivated: {
                 ConfigUtils.debug("Stop activated");
-                stop();
+                webviewID.action(WebEngineView.Stop).trigger();
                 plasmoid.busy = false;
             }
         }
 
         /**
          * Hack to handle the size of the popup when displayed as a compactRepresentation
+         *
+         * Debounced: width/height can change in rapid bursts (layout negotiation,
+         * panel resize, popup-open animation, fillWidth/fillHeight recalculation),
+         * and each change used to trigger an immediate, uncoalesced reload() - a
+         * runaway reload storm under the right conditions. Route through the
+         * resizeReloadDebounce timer instead of reloading synchronously here.
          */
-        function updateSizeHints() {
-            ConfigUtils.debug("  updateSizeHints");
-            ConfigUtils.debug("    width: " + webviewID.width + " " + webPopupWidth + " " + plasmoid.configuration.webPopupWidth);
-            ConfigUtils.debug("    height: " + webviewID.height + " " + webPopupHeight + " " + plasmoid.configuration.webPopupHeight);
-            webviewID.zoomFactor = main.zoomFactorCfg;
-            webviewID.reload();
-            return;
+        function updateSizeHints(reason) {
+            ConfigUtils.debug("  updateSizeHints reason=" + reason);
+            ConfigUtils.debug("    width: " + webviewID.width + " " + main.webPopupWidth + " " + plasmoid.configuration.webPopupWidth);
+            ConfigUtils.debug("    height: " + webviewID.height + " " + main.webPopupHeight + " " + plasmoid.configuration.webPopupHeight);
+            resizeReloadDebounce.pendingReason = reason || "size-hints";
+            resizeReloadDebounce.restart();
+        }
+
+        Timer {
+            id: resizeReloadDebounce
+            interval: 500
+            property string pendingReason: "size-hints"
+            onTriggered: {
+                webviewID.zoomFactor = main.zoomFactorCfg;
+                webviewID.reloadFn(false, "resize-debounce:" + pendingReason);
+            }
         }
 
         /**
          * Handle everything around web request : display the busy indicator, and run JS
          */
         onLoadingChanged: function (loadingInfo) {
+            logEvent("loadingChanged", ConfigUtils.loadString(loadingInfo.status) + " url=" + loadingInfo.url + (loadingInfo.status === WebEngineView.LoadFailedStatus ? " error=" + loadingInfo.errorString : ""));
             ConfigUtils.debug("onLoadingChanged");
             ConfigUtils.debug("  loadingInfo.status:", ConfigUtils.loadString(loadingInfo.status));
             ConfigUtils.debug("  loadingInfo.errorCode:", loadingInfo.errorCode);
@@ -242,10 +249,10 @@ Plasmoid.PlasmoidItem {
             ConfigUtils.debug("  zoomFactorCfg:", main.zoomFactorCfg);
             webviewID.zoomFactor = main.zoomFactorCfg;
             if (main.enableScrollTo && loadingInfo.status === WebEngineView.LoadSucceededStatus) {
-                runJavaScript("window.scrollTo(" + scrollToX + ", " + scrollToY + ");");
+                runJavaScript("window.scrollTo(" + main.scrollToX + ", " + main.scrollToY + ");");
             }
             if (main.enableJSID && loadingInfo.status === WebEngineView.LoadSucceededStatus) {
-                runJavaScript(jsSelector + ".scrollIntoView(true);");
+                runJavaScript(main.jsSelector + ".scrollIntoView(true);");
             }
             if (main.scrollbarsOverflow && loadingInfo.status === WebEngineView.LoadSucceededStatus) {
                 runJavaScript("document.body.style.overflow='hidden';");
@@ -263,14 +270,20 @@ Plasmoid.PlasmoidItem {
         }
 
         onRenderProcessPidChanged: {
+            logEvent("renderProcessPidChanged", "pid=" + renderProcessPid);
             ConfigUtils.debug("onRenderProcessPidChanged");
+        }
+
+        onUrlChanged: {
+            logEvent("urlChanged", "url=" + url);
         }
 
         /**
          * Open the middle clicked (or ctrl+clicked) link in the default browser
          */
         onNavigationRequested: function (request) {
-            ConfigUtils.debug("onNavigationRequested, isMainFrame:", request.isMainFrame, "navigationType:", ConfigUtils.navTypeString(request.navigationType), "url:", request.url, "isExternalLink:", isExternalLink, "zoomFactorCfg:", zoomFactorCfg);
+            logEvent("navigationRequested", "mainFrame=" + request.isMainFrame + " type=" + ConfigUtils.navTypeString(request.navigationType) + " url=" + request.url);
+            ConfigUtils.debug("onNavigationRequested, isMainFrame:", request.isMainFrame, "navigationType:", ConfigUtils.navTypeString(request.navigationType), "url:", request.url, "isExternalLink:", isExternalLink, "zoomFactorCfg:", main.zoomFactorCfg);
             webviewID.zoomFactor = main.zoomFactorCfg;
             if (isExternalLink) {
                 isExternalLink = false;
@@ -295,7 +308,17 @@ Plasmoid.PlasmoidItem {
 
         onRenderProcessTerminated: function (terminationStatus, exitCode) {
             ConfigUtils.debug("onRenderProcessTerminated terminationStatus:", terminationStatus, "exitCode:", exitCode);
-            reloadFn(false);
+            console.warn(logTag + " render process terminated (status=" + terminationStatus + ", exitCode=" + exitCode + "), debouncing recovery reload");
+            renderTerminatedReloadDebounce.restart();
+        }
+
+        // Debounced so a renderer that crashes repeatedly (e.g. under memory
+        // pressure) can't turn into a tight crash/reload loop; each new
+        // termination just pushes the recovery reload out further.
+        Timer {
+            id: renderTerminatedReloadDebounce
+            interval: 2000
+            onTriggered: webviewID.reloadFn(false, "render-process-terminated")
         }
 
         /*
@@ -340,6 +363,7 @@ Plasmoid.PlasmoidItem {
         }
 
         onJavaScriptConsoleMessage: function (level, msg, line, source) {
+            logEvent("jsConsole", "level=" + level + " src=" + source + ":" + line + " msg=" + String(msg).substring(0, 100));
             ConfigUtils.debug("webslice: ", level, " - ", msg, " -", line, " - ", source);
         }
 
@@ -378,9 +402,9 @@ Plasmoid.PlasmoidItem {
                     // Force reload if Ctrl pressed
                     if (dataSource.data.Ctrl !== undefined && dataSource.data.Ctrl.Pressed) {
                         ConfigUtils.debug("Force reload.");
-                        webviewID.reloadFn(true);
+                        webviewID.reloadFn(true, "context-menu-force");
                     } else {
-                        webviewID.reloadFn(false);
+                        webviewID.reloadFn(false, "context-menu");
                     }
                 }
             }
@@ -421,12 +445,75 @@ Plasmoid.PlasmoidItem {
             repeat: true
             onTriggered: {
                 ConfigUtils.debug("reload triggered");
-                webviewID.reloadFn(false);
+                webviewID.reloadFn(false, "auto-reload-timer");
             }
         }
 
-        function reloadFn(force) {
-            ConfigUtils.debug("reloadFn: ", force);
+        readonly property string logTag: "webslice[" + main.plasmoid.id + "]:"
+
+        // Per-kind event counts for the current eventStatsTimer window. Used by
+        // logEvent() to log the first few events of each kind in full and then
+        // only summarize, so a page-driven event flood is visible in the
+        // journal without our own logging adding to the flood.
+        property var eventCounts: ({})
+        readonly property int eventLogBurst: 5
+
+        function logEvent(kind, detail) {
+            const count = (eventCounts[kind] || 0) + 1;
+            eventCounts[kind] = count;
+            if (count <= eventLogBurst) {
+                console.log(logTag + " " + kind + " " + detail);
+            }
+            if (!eventStatsTimer.running) {
+                eventStatsTimer.start();
+            }
+        }
+
+        Timer {
+            id: eventStatsTimer
+            interval: 10000
+            repeat: true
+            onTriggered: {
+                const summary = [];
+                let noisy = false;
+                for (const kind in webviewID.eventCounts) {
+                    summary.push(kind + "=" + webviewID.eventCounts[kind]);
+                    if (webviewID.eventCounts[kind] > webviewID.eventLogBurst) {
+                        noisy = true;
+                    }
+                }
+                if (summary.length === 0) {
+                    stop();
+                    return;
+                }
+                if (noisy) {
+                    console.warn(webviewID.logTag + " event burst in last " + (interval / 1000) + "s: " + summary.join(" "));
+                }
+                webviewID.eventCounts = ({});
+            }
+        }
+
+        // Recent reloadFn() call timestamps (ms), used only for the loop
+        // detection below; pruned to the last reloadLoopWindowMs on every call.
+        property var reloadTimestamps: []
+        readonly property int reloadLoopWindowMs: 10000
+        readonly property int reloadLoopWarnThreshold: 5
+
+        function reloadFn(force, reason) {
+            const label = reason || "unknown";
+            const now = Date.now();
+            reloadTimestamps = reloadTimestamps.filter(t => now - t < reloadLoopWindowMs);
+            reloadTimestamps.push(now);
+
+            // Unconditional (not gated behind the debug config flag) so a
+            // reload storm is visible in the journal even when debug logging
+            // is off. Deliberately not itself debounced/rate-limited: this
+            // logging exists to make runaway-reload incidents diagnosable.
+            console.log(logTag + " reloadFn force=" + force + " reason=" + label + " recentReloads(" + (reloadLoopWindowMs / 1000) + "s)=" + reloadTimestamps.length);
+            if (reloadTimestamps.length >= reloadLoopWarnThreshold) {
+                console.warn(logTag + " possible reload loop detected - " + reloadTimestamps.length + " reloads in the last " + (reloadLoopWindowMs / 1000) + "s (last reason: " + label + ")");
+            }
+
             if (main.reloadAnimation) {
                 main.plasmoid.busy = true;
             }
@@ -446,7 +533,7 @@ Plasmoid.PlasmoidItem {
         ConfigUtils.debug("loadURLs");
         var arrayURLs = ConfigUtils.getURLsObjectArray();
         urlsToShow.clear();
-        for (var index in arrayURLs) {
+        for (const index in arrayURLs) {
             urlsToShow.append({
                 "url": arrayURLs[index]
             });
