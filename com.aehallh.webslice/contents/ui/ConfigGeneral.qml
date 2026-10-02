@@ -7,6 +7,8 @@ import org.kde.kirigami as Kirigami
 import "./libconfig" as LibConfig
 
 KCMUtils.SimpleKCM {
+    id: root
+
     property alias cfg_websliceUrl: websliceUrl.text
     property alias cfg_zoomFactor: zoomFactor.value
     property alias cfg_enableReload: enableReload.checked
@@ -15,21 +17,21 @@ KCMUtils.SimpleKCM {
     property alias cfg_reloadAnimation: reloadAnimation.checked
 
     property alias cfg_customBackgroundColor: customBackgroundColor.color
-    
+
     property double maxWidth: width - 22
 
     GridLayout {
         Layout.fillWidth: true
-        Layout.maximumWidth: maxWidth
+        Layout.maximumWidth: root.maxWidth
         columns: 4
         rowSpacing: 20
 
         // URL
-        GridLayout{
+        GridLayout {
             Layout.fillWidth: true
             Layout.columnSpan: 4
             columns: 3
-            
+
             Label {
                 text: i18n('URL :')
                 Layout.columnSpan: 1
@@ -42,13 +44,13 @@ KCMUtils.SimpleKCM {
                 Layout.fillWidth: true
             }
         }
-        
+
         // Zoom Factor
-        GridLayout{
+        GridLayout {
             Layout.fillWidth: true
             Layout.columnSpan: 4
             columns: 4
-            
+
             Label {
                 text: i18n('Zoom factor :')
                 Layout.columnSpan: 1
@@ -62,26 +64,25 @@ KCMUtils.SimpleKCM {
                 stepSize: 0.25
                 Layout.columnSpan: 2
                 Layout.fillWidth: true
-                
             }
-                Label {
-                    id:zoof
-                    Layout.columnSpan: 1
-                    text: zoomFactor.value+"x"
-                    width:35
-                    //anchors.horizontalCenter: parent.horizontalCenter
-                    //anchors.bottom: parent.top
-                    Layout.minimumWidth:35
-                    Layout.maximumWidth:35
-                }
+            Label {
+                id: zoof
+                Layout.columnSpan: 1
+                text: zoomFactor.value + "x"
+                width: 35
+                //anchors.horizontalCenter: parent.horizontalCenter
+                //anchors.bottom: parent.top
+                Layout.minimumWidth: 35
+                Layout.maximumWidth: 35
+            }
         }
 
         // Auto reload
-        GridLayout{
+        GridLayout {
             Layout.fillWidth: true
             Layout.columnSpan: 4
             columns: 3
-            
+
             CheckBox {
                 id: enableReload
                 text: i18n('Enable auto reload')
@@ -101,20 +102,19 @@ KCMUtils.SimpleKCM {
                 from: 15
                 to: 360000
                 stepSize: 15
-		valueFromText: function(text, locale) {
-		    var text2 = text
-			.replace(/[^\-\.\d]/g, '') // Remove non digit characters
-			.replace(/\.+/g, '.') // Allow user to type '.' instead of RightArrow to enter to decimals
-			.replace(/ sec$/, '') // Remove the second abbreviation.  FIXME: i18nc
-		    var val = Number(text2)
-		    if (isNaN(val)) {
-			val = -0
-		    }
-		    // console.log('valueFromText', text, val)
-		    var factor = Math.pow(10,0)
-		    return Math.round(val * factor)
-		}
-                textFromValue: function(value, locale) {
+                valueFromText: function (text, locale) {
+                    var text2 = text.replace(/[^\-\.\d]/g, '') // Remove non digit characters
+                    .replace(/\.+/g, '.') // Allow user to type '.' instead of RightArrow to enter to decimals
+                    .replace(/ sec$/, ''); // Remove the second abbreviation.  FIXME: i18nc
+                    var val = Number(text2);
+                    if (isNaN(val)) {
+                        val = -0;
+                    }
+                    // console.log('valueFromText', text, val)
+                    var factor = Math.pow(10, 0);
+                    return Math.round(val * factor);
+                }
+                textFromValue: function (value, locale) {
                     return i18nc('Abbreviation for seconds', '%1 sec', value);
                 }
                 Layout.columnSpan: 2
@@ -122,10 +122,10 @@ KCMUtils.SimpleKCM {
         }
 
         // Loading animation
-        ColumnLayout{
+        ColumnLayout {
             Layout.fillWidth: true
             Layout.columnSpan: 4
-            
+
             CheckBox {
                 id: reloadAnimation
                 text: i18n('Display loading animation')
@@ -133,31 +133,46 @@ KCMUtils.SimpleKCM {
         }
 
         // Plasmoid background color
-        ColumnLayout{
+        ColumnLayout {
             Layout.fillWidth: true
-            Layout.columnSpan: 4           
-            
+            Layout.columnSpan: 4
+
             Label {
                 Layout.fillWidth: true
                 text: i18n('Plasmoid background color :')
             }
-            
+
             ColumnLayout {
                 LibConfig.ComboBox {
                     Kirigami.FormData.label: i18n("Plasmoid background color:")
                     configKey: "backgroundColor"
                     model: [
-                        { value: "white", text: i18n("White") },
-                        { value: "black", text: i18n("Black") },
-                        { value: "theme", text: i18n("Theme's background color") },
-                        { value: "transparent", text: i18n("Transparent <i>(⚠ might cause drawing issues)</i>") },
-                        { value: "custom", text: i18n("Custom") },
+                        {
+                            value: "white",
+                            text: i18n("White")
+                        },
+                        {
+                            value: "black",
+                            text: i18n("Black")
+                        },
+                        {
+                            value: "theme",
+                            text: i18n("Theme's background color")
+                        },
+                        {
+                            value: "transparent",
+                            text: i18n("Transparent <i>(⚠ might cause drawing issues)</i>")
+                        },
+                        {
+                            value: "custom",
+                            text: i18n("Custom")
+                        },
                     ]
                 }
 
                 ColorButton {
                     id: customBackgroundColor
-                    showAlphaChannel:true
+                    showAlphaChannel: true
                     visible: plasmoid.configuration.backgroundColor == "custom"
                     onColorChanged: {
                         console.log("Color changed", color);
@@ -171,7 +186,7 @@ KCMUtils.SimpleKCM {
                 font.italic: true
                 text: i18n('Note that the background color will only be visible if the page background is also transparent or not set. This setting is for the background of the plasmoid, not of the page.')
                 wrapMode: Text.Wrap
-                Layout.maximumWidth: maxWidth
+                Layout.maximumWidth: root.maxWidth
             }
         }
     }

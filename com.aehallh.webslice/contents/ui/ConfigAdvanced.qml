@@ -1,12 +1,12 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.10
-import org.kde.kquickcontrols 2.0
-import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.kcmutils as KCMUtils
 import org.kde.kirigami as Kirigami
 
 KCMUtils.SimpleKCM {
+    id: root
+
     property alias cfg_enableScrollTo: enableScrollTo.checked
     property alias cfg_scrollToX: scrollToX.text
     property alias cfg_scrollToY: scrollToY.text
@@ -28,13 +28,13 @@ KCMUtils.SimpleKCM {
     property alias cfg_enableJS: enableJS.checked
     property alias cfg_js: js.text
 
-    property int textfieldWidth: PlasmaCore.Theme.defaultFont.pointSize * 30
+    property int textfieldWidth: Kirigami.Theme.defaultFont.pointSize * 30
 
     property double maxWidth: width - 22
 
     GridLayout {
         Layout.fillWidth: true
-        width: maxWidth
+        width: root.maxWidth
         columns: 4
         rowSpacing: 25
 
@@ -141,7 +141,7 @@ KCMUtils.SimpleKCM {
             TextField {
                 id: jsSelector
                 placeholderText: 'document.getElementById("id")'
-                Layout.minimumWidth: textfieldWidth
+                Layout.minimumWidth: root.textfieldWidth
                 enabled: enableJSID.checked
                 Layout.columnSpan: 3
                 Layout.fillWidth: true
@@ -170,7 +170,7 @@ KCMUtils.SimpleKCM {
             TextField {
                 id: customUA
                 placeholderText: 'QtWebEngine/5.12.4 Chrome/69.0.3497.128'
-                Layout.minimumWidth: textfieldWidth
+                Layout.minimumWidth: root.textfieldWidth
                 enabled: enableCustomUA.checked
                 Layout.columnSpan: 3
                 Layout.fillWidth: true
@@ -254,7 +254,7 @@ KCMUtils.SimpleKCM {
             TextArea {
                 id: js
                 Layout.fillWidth: true
-                Layout.minimumWidth: textfieldWidth
+                Layout.minimumWidth: root.textfieldWidth
                 enabled: enableJS.checked
                 Layout.columnSpan: 3
             }
